@@ -1,12 +1,15 @@
-// lib/delegates/surah_search_delegate.dart (Contoh path)
+// Salin dan timpa seluruh file lib/delegates/surah_search_delegate.dart
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // Untuk 'rootBundle'
-// import 'dart:convert';
 import 'package:flutter_pam/models/surah.dart'; // Sesuaikan path ke model Anda
-import 'package:flutter_pam/globals.dart';
+import 'package:flutter_pam/globals.dart'; // Import globals untuk warna
 import 'package:google_fonts/google_fonts.dart';
 
+// --- BARU: Import DetailScreen ---
+import 'package:flutter_pam/screens/detail_screen.dart'; // <-- Sesuaikan path ke DetailScreen Anda
+
+// Pastikan Anda sudah mendaftarkan 'assets/datas/list-surah.json' di pubspec.yaml
 class SurahSearchDelegate extends SearchDelegate<Surah?> {
   late Future<List<Surah>> _surahListFuture;
 
@@ -18,11 +21,8 @@ class SurahSearchDelegate extends SearchDelegate<Surah?> {
   // --- Fungsi untuk Membaca data dari list-surah.json ---
   Future<List<Surah>> _loadSurahsFromAsset() async {
     try {
-      // 1. Muat string JSON dari file aset
       final String jsonString =
           await rootBundle.loadString('assets/datas/list-surah.json');
-
-      // 2. Gunakan fungsi 'surahFromJson' dari model Anda
       final List<Surah> surahs = surahFromJson(jsonString);
       return surahs;
     } catch (e) {
@@ -124,13 +124,23 @@ class SurahSearchDelegate extends SearchDelegate<Surah?> {
                   style: TextStyle(color: text)),
               trailing: Text(surah.nama,
                   style: GoogleFonts.amiri(color: primary, fontSize: 20)),
+
+              // --- MODIFIKASI: Navigasi ke DetailScreen ---
               onTap: () {
-                close(context, surah);
-                // TODO: Navigasi ke halaman detail surah
-                // Navigator.push(context, MaterialPageRoute(
-                //   builder: (context) => DetailScreen(surah: surah)
-                // ));
+                // 1. Tutup halaman search (opsional, tapi bagus agar tidak menumpuk)
+                // Jika Anda ingin search tetap terbuka di belakang, hapus baris ini
+                // close(context, surah);
+
+                // 2. Navigasi ke DetailScreen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    // Kirim nomor surah ke DetailScreen
+                    builder: (context) => DetailScreen(noSurat: surah.nomor),
+                  ),
+                );
               },
+              // ------------------------------------------
             );
           },
         );
@@ -138,30 +148,24 @@ class SurahSearchDelegate extends SearchDelegate<Surah?> {
     );
   }
 
-  // ================================================================
-  // --- INI ADALAH BAGIAN YANG DIPERBAIKI ---
-  // ================================================================
   @override
   ThemeData appBarTheme(BuildContext context) {
     return Theme.of(context).copyWith(
       scaffoldBackgroundColor: background,
       primaryColor: primary,
       appBarTheme: AppBarTheme(
-        // <-- 'const' ditambahkan
         backgroundColor: background,
         elevation: 0,
         iconTheme: IconThemeData(color: Colors.white),
       ),
       textTheme: TextTheme(
-        // 'headline6' diganti menjadi 'titleLarge'
         titleLarge: TextStyle(
           color: Colors.white,
           fontSize: 18.0,
-          fontWeight: FontWeight.normal, // Dibuat normal agar tidak tebal
+          fontWeight: FontWeight.normal,
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
-        // <-- 'const' ditambahkan
         hintStyle: TextStyle(color: text), // Warna 'Search...'
       ),
     );

@@ -1,3 +1,5 @@
+// Salin dan timpa seluruh file lib/screens/home_screen.dart Anda
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -7,18 +9,17 @@ import 'package:flutter_pam/tabs/page_tab.dart';
 import 'package:flutter_pam/tabs/para_tab.dart';
 import 'package:flutter_pam/tabs/surah_tab.dart';
 
-// Tambahkan import halaman lain
-import 'package:flutter_pam/screens/currency_converter_screen.dart';
+// --- Import Halaman Lain ---
+import 'package:flutter_pam/screens/currency_converter_screen.dart'; // Pastikan ini KalkulatorZakatPage
 import 'package:flutter_pam/screens/time_converter_screen.dart';
 import 'package:flutter_pam/screens/bookmark_screen.dart';
 import 'package:flutter_pam/screens/profile_screen.dart';
 
-// --- BARU: Import Search Delegate ---
+// --- Import Search Delegate ---
 import 'package:flutter_pam/delegates/surah_search_delegate.dart'; // Sesuaikan path
 
 // ===================================================
-// Class HomeScreen Anda (Termasuk BottomNavBar)
-// TIDAK ADA PERUBAHAN DI SINI
+// --- HomeScreen SEKARANG StatefulWidget ---
 // ===================================================
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -28,10 +29,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // Tambahkan currentIndex untuk navigasi
+  // Pindahkan state ke sini
   int _selectedIndex = 0;
 
-  // Daftar halaman (urut sesuai bottom navigation)
+  // Daftar halaman tetap sama
   final List<Widget> _pages = [
     const HomeTabContent(), // Halaman utama (Quran)
     const KalkulatorZakatPage(),
@@ -40,6 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
     const ProfileScreen(),
   ];
 
+  // Fungsi onTap untuk mengubah state
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -50,18 +52,27 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: background,
+      // Tampilkan halaman berdasarkan _selectedIndex
       body: _pages[_selectedIndex],
+      // Bangun BottomNavigationBar di sini
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         backgroundColor: gray,
         showSelectedLabels: false,
         showUnselectedLabels: false,
+        // Gunakan state _selectedIndex
         currentIndex: _selectedIndex,
+        // Panggil fungsi _onItemTapped saat item diklik
         onTap: _onItemTapped,
         items: [
+          // Panggil _bottomBarItem untuk setiap item
           _bottomBarItem(icon: "assets/svgs/quran-icon.svg", label: "Quran"),
-          _bottomBarItem(icon: "assets/svgs/money-icon.svg", label: "Money"),
-          _bottomBarItem(icon: "assets/svgs/time-icon.svg", label: "Time"),
+          _bottomBarItem(
+              icon: "assets/svgs/money-icon.svg",
+              label: "Money"), // Sesuaikan ikon jika perlu
+          _bottomBarItem(
+              icon: "assets/svgs/time-icon.svg",
+              label: "Time"), // Sesuaikan ikon jika perlu
           _bottomBarItem(
               icon: "assets/svgs/bookmark-icon.svg", label: "Bookmark"),
           _bottomBarItem(
@@ -71,24 +82,25 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  // Metode _bottomBarItem tetap sama
   BottomNavigationBarItem _bottomBarItem(
           {required String icon, required String label}) =>
       BottomNavigationBarItem(
           icon: SvgPicture.asset(
             icon,
             // ignore: deprecated_member_use
-            color: text,
+            color: text, // Warna ikon tidak aktif
           ),
           activeIcon: SvgPicture.asset(
             icon,
             // ignore: deprecated_member_use
-            color: primary,
+            color: primary, // Warna ikon aktif
           ),
           label: label);
 }
 
 // ===================================================
-// Class HomeTabContent (Dengan Modifikasi Search)
+// Class HomeTabContent (Tetap StatelessWidget, tidak berubah dari sebelumnya)
 // ===================================================
 class HomeTabContent extends StatelessWidget {
   const HomeTabContent({super.key});
@@ -97,8 +109,7 @@ class HomeTabContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: background,
-      // --- MODIFIKASI: _appBar sekarang perlu 'context' ---
-      appBar: _appBar(context),
+      appBar: _appBar(context), // Panggil _appBar (NON-STATIC)
       body: DefaultTabController(
         length: 4,
         child: Padding(
@@ -129,15 +140,14 @@ class HomeTabContent extends StatelessWidget {
     );
   }
 
-  // --- MODIFIKASI: HAPUS 'static' DARI _appBar ---
-  // --- 'static' DIHAPUS agar bisa memanggil showSearch(context: context) ---
+  // --- AppBar untuk HomeTabContent ---
   AppBar _appBar(BuildContext context) => AppBar(
         backgroundColor: background,
         automaticallyImplyLeading: false,
         elevation: 0,
         title: Row(children: [
           IconButton(
-              onPressed: (() => {}),
+              onPressed: (() => {}), // TODO: Implementasi menu drawer?
               icon: SvgPicture.asset('assets/svgs/menu-icon.svg')),
           const SizedBox(width: 24),
           Text(
@@ -147,25 +157,19 @@ class HomeTabContent extends StatelessWidget {
           ),
           const Spacer(),
           IconButton(
-              // --- MODIFIKASI: FUNGSI SEARCH DIISI ---
               onPressed: () {
                 showSearch(
                   context: context,
                   delegate: SurahSearchDelegate(),
                 );
               },
-              // ------------------------------------
               icon: SvgPicture.asset('assets/svgs/search-icon.svg')),
         ]),
       );
 
-  // ===================================================
-  // --- TIDAK ADA PERUBAHAN DI BAWAH INI ---
-  // --- Metode ini TETAP STATIC agar tidak merusak kode Anda ---
-  // ===================================================
+  // --- Widget-widget statis untuk HomeTabContent ---
 
-  // Untuk membuat tab bar
-  static TabBar _tab() {
+  TabBar _tab() {
     return TabBar(
         unselectedLabelColor: text,
         labelColor: Colors.white,
@@ -179,7 +183,7 @@ class HomeTabContent extends StatelessWidget {
         ]);
   }
 
-  static Tab _tabItem({required String label}) {
+  Tab _tabItem({required String label}) {
     return Tab(
       child: Text(
         label,
@@ -188,7 +192,7 @@ class HomeTabContent extends StatelessWidget {
     );
   }
 
-  static Column _greeting() {
+  Column _greeting() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -199,7 +203,7 @@ class HomeTabContent extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          'Desi Pangestuti',
+          'Desi Pangestuti', // TODO: Ganti dengan nama pengguna login
           style: GoogleFonts.poppins(
               fontSize: 24, fontWeight: FontWeight.w600, color: Colors.white),
         ),
@@ -209,7 +213,7 @@ class HomeTabContent extends StatelessWidget {
     );
   }
 
-  static Stack _lastRead() {
+  Stack _lastRead() {
     return Stack(
       children: [
         Container(
@@ -244,7 +248,7 @@ class HomeTabContent extends StatelessWidget {
                   SvgPicture.asset('assets/svgs/book.svg'),
                   const SizedBox(width: 8),
                   Text(
-                    'Sudahkah Anda',
+                    'Have You Read',
                     style: GoogleFonts.poppins(
                         color: Colors.white, fontWeight: FontWeight.w500),
                   ),
@@ -252,7 +256,7 @@ class HomeTabContent extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               Text(
-                'Membaca Al-Quran',
+                'Al-Quran',
                 style: GoogleFonts.poppins(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
@@ -260,7 +264,7 @@ class HomeTabContent extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                'Hari ini?',
+                'Today?',
                 style: GoogleFonts.poppins(color: Colors.white),
               ),
             ],

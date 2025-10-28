@@ -1,25 +1,35 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_pam/screens/splash_screen.dart';
+import 'package:flutter_pam/screens/splash_screen.dart'; // Mulai dari Splash Screen
+// Hapus import Notifikasi jika Anda belum siap mengimplementasikannya
+// import 'package:flutter_pam/services/notification_service.dart';
+// import 'package:timezone/data/latest_all.dart' as tz;
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // try {
+  //   await NotificationService().initNotification();
+  //   await NotificationService().scheduleDailyAyahNotification();
+  // } catch (e) {
+  //    debugPrint("Error saat setup notifikasi: $e");
+  // }
+
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
-
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Quran Now',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        // ... tema Anda ...
+        brightness: Brightness.dark, // Sesuaikan tema gelap/terang
+        // Atur warna primer, dll jika perlu
       ),
-      debugShowCheckedModeBanner: false,
+      // Mulai dari SplashScreen
       home: const SplashScreen(),
     );
   }
