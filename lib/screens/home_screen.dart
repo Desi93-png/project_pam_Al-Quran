@@ -1,26 +1,20 @@
-// Salin dan timpa seluruh file lib/screens/home_screen.dart Anda
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_pam/globals.dart';
-import 'package:flutter_pam/tabs/hijb_tab.dart';
-import 'package:flutter_pam/tabs/page_tab.dart';
-import 'package:flutter_pam/tabs/para_tab.dart';
 import 'package:flutter_pam/tabs/surah_tab.dart';
 
 // --- Import Halaman Lain ---
-import 'package:flutter_pam/screens/currency_converter_screen.dart'; // Pastikan ini KalkulatorZakatPage
+import 'package:flutter_pam/screens/currency_converter_screen.dart'; // KalkulatorZakatPage
 import 'package:flutter_pam/screens/time_converter_screen.dart';
 import 'package:flutter_pam/screens/bookmark_screen.dart';
 import 'package:flutter_pam/screens/profile_screen.dart';
 
-// --- Import Search Delegate ---
-import 'package:flutter_pam/delegates/surah_search_delegate.dart'; // Sesuaikan path
+// --- Import Tambahan ---
+import 'package:flutter_pam/delegates/surah_search_delegate.dart'; // Search
+import 'package:shared_preferences/shared_preferences.dart'; // Session
+import 'package:flutter_pam/helpers/database_helper.dart'; // Database
 
-// ===================================================
-// --- HomeScreen SEKARANG StatefulWidget ---
-// ===================================================
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -29,19 +23,18 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // Pindahkan state ke sini
   int _selectedIndex = 0;
 
-  // Daftar halaman tetap sama
+  // --- Daftar Halaman (Widget HomeTabContent SEKARANG perlu dibuat instance baru) ---
+  // Kita tidak bisa pakai 'const' lagi karena HomeTabContent jadi StatefulWidget
   final List<Widget> _pages = [
-    const HomeTabContent(), // Halaman utama (Quran)
+    HomeTabContent(), // Hapus 'const'
     const KalkulatorZakatPage(),
     const TimeConverterScreen(),
     const BookmarkScreen(),
     const ProfileScreen(),
   ];
 
-  // Fungsi onTap untuk mengubah state
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -52,27 +45,22 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: background,
-      // Tampilkan halaman berdasarkan _selectedIndex
       body: _pages[_selectedIndex],
-      // Bangun BottomNavigationBar di sini
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         backgroundColor: gray,
         showSelectedLabels: false,
         showUnselectedLabels: false,
-        // Gunakan state _selectedIndex
         currentIndex: _selectedIndex,
-        // Panggil fungsi _onItemTapped saat item diklik
         onTap: _onItemTapped,
         items: [
-          // Panggil _bottomBarItem untuk setiap item
           _bottomBarItem(icon: "assets/svgs/quran-icon.svg", label: "Quran"),
           _bottomBarItem(
               icon: "assets/svgs/money-icon.svg",
-              label: "Money"), // Sesuaikan ikon jika perlu
+              label: "Zakat"), // Ganti label jika perlu
           _bottomBarItem(
               icon: "assets/svgs/time-icon.svg",
-              label: "Time"), // Sesuaikan ikon jika perlu
+              label: "Sholat"), // Ganti label jika perlu
           _bottomBarItem(
               icon: "assets/svgs/bookmark-icon.svg", label: "Bookmark"),
           _bottomBarItem(
@@ -82,29 +70,86 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // Metode _bottomBarItem tetap sama
   BottomNavigationBarItem _bottomBarItem(
           {required String icon, required String label}) =>
       BottomNavigationBarItem(
           icon: SvgPicture.asset(
             icon,
-            // ignore: deprecated_member_use
-            color: text, // Warna ikon tidak aktif
+            color: text,
           ),
           activeIcon: SvgPicture.asset(
             icon,
-            // ignore: deprecated_member_use
-            color: primary, // Warna ikon aktif
+            color: primary,
           ),
           label: label);
 }
 
 // ===================================================
-// Class HomeTabContent (Tetap StatelessWidget, tidak berubah dari sebelumnya)
+// --- HomeTabContent SEKARANG StatefulWidget ---
 // ===================================================
-class HomeTabContent extends StatelessWidget {
-  const HomeTabContent({super.key});
+class HomeTabContent extends StatefulWidget {
+  // Hapus 'const' dari constructor
+  HomeTabContent({super.key});
 
+  @override
+  State<HomeTabContent> createState() => _HomeTabContentState();
+}
+
+class _HomeTabContentState extends State<HomeTabContent> {
+  // --- State untuk menyimpan nama pengguna ---
+  String _userName = "Pengguna"; // Default name
+  bool _isLoadingName = true;
+  final dbHelper = DatabaseHelper();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserName(); // Panggil fungsi load nama saat widget dibuat
+  }
+
+  // --- Fungsi untuk memuat nama pengguna ---
+  Future<void> _loadUserName() async {
+    if (!mounted) return;
+    setState(() {
+      _isLoadingName = true;
+    });
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final int? userId = prefs.getInt('userId');
+      if (userId != null) {
+        final user = await dbHelper.getUserById(userId);
+        if (user != null && mounted) {
+          setState(() {
+            // Ambil nama lengkap dari user
+            _userName = user.namaLengkap;
+            _isLoadingName = false;
+          });
+        } else if (mounted) {
+          // User tidak ditemukan di DB
+          setState(() {
+            _userName = "Pengguna";
+            _isLoadingName = false;
+          });
+        }
+      } else if (mounted) {
+        // User ID tidak ada di session
+        setState(() {
+          _userName = "Pengguna";
+          _isLoadingName = false;
+        });
+      }
+    } catch (e) {
+      print("Error loading user name: $e");
+      if (mounted) {
+        setState(() {
+          _userName = "Pengguna";
+          _isLoadingName = false;
+        }); // Fallback jika error
+      }
+    }
+  }
+
+  // --- Build Method (Tidak berubah signifikan) ---
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -116,7 +161,8 @@ class HomeTabContent extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: NestedScrollView(
             headerSliverBuilder: (context, innerBoxIsScrolled) => [
-              SliverToBoxAdapter(child: _greeting()),
+              // --- Kirim nama pengguna ke _greeting ---
+              SliverToBoxAdapter(child: _greeting(_userName, _isLoadingName)),
               SliverAppBar(
                 pinned: true,
                 elevation: 0,
@@ -132,23 +178,19 @@ class HomeTabContent extends StatelessWidget {
                 ),
               )
             ],
-            body: const TabBarView(
-                children: [SurahTab(), ParaTab(), PageTab(), HijbTab()]),
+            body: const TabBarView(children: [SurahTab()]),
           ),
         ),
       ),
     );
   }
 
-  // --- AppBar untuk HomeTabContent ---
+  // --- AppBar untuk HomeTabContent (Tidak Berubah) ---
   AppBar _appBar(BuildContext context) => AppBar(
         backgroundColor: background,
         automaticallyImplyLeading: false,
         elevation: 0,
         title: Row(children: [
-          IconButton(
-              onPressed: (() => {}), // TODO: Implementasi menu drawer?
-              icon: SvgPicture.asset('assets/svgs/menu-icon.svg')),
           const SizedBox(width: 24),
           Text(
             'Quran App',
@@ -167,19 +209,17 @@ class HomeTabContent extends StatelessWidget {
         ]),
       );
 
-  // --- Widget-widget statis untuk HomeTabContent ---
+  // --- Widget-widget statis/helper untuk HomeTabContent ---
+  // Metode ini TIDAK perlu 'static' lagi karena dipanggil dari instance _HomeTabContentState
 
   TabBar _tab() {
     return TabBar(
         unselectedLabelColor: text,
         labelColor: Colors.white,
         indicatorColor: primary,
-        indicatorWeight: 3,
+        indicatorWeight: 1,
         tabs: [
           _tabItem(label: "Surah"),
-          _tabItem(label: "Para"),
-          _tabItem(label: "Page"),
-          _tabItem(label: "Hijb"),
         ]);
   }
 
@@ -192,7 +232,8 @@ class HomeTabContent extends StatelessWidget {
     );
   }
 
-  Column _greeting() {
+  // --- Modifikasi _greeting untuk menerima nama ---
+  Column _greeting(String userName, bool isLoading) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -202,11 +243,13 @@ class HomeTabContent extends StatelessWidget {
               fontSize: 18, fontWeight: FontWeight.w500, color: text),
         ),
         const SizedBox(height: 4),
+        // --- Tampilkan nama dinamis atau loading ---
         Text(
-          'Desi Pangestuti', // TODO: Ganti dengan nama pengguna login
+          isLoading ? "Memuat..." : userName, // Tampilkan nama atau loading
           style: GoogleFonts.poppins(
               fontSize: 24, fontWeight: FontWeight.w600, color: Colors.white),
         ),
+        // ------------------------------------------
         const SizedBox(height: 24),
         _lastRead()
       ],

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // <-- TAMBAHKAN IMPORT INI
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:intl/intl.dart';
 
-// ================================================================
-// --- CLASS FORMATTER BARU (LANGKAH 1) ---
-// ================================================================
+import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_pam/globals.dart'; // Import color palette Anda
+
 class CurrencyInputFormatter extends TextInputFormatter {
   final formatter = NumberFormat.decimalPattern('id');
 
@@ -28,7 +28,6 @@ class CurrencyInputFormatter extends TextInputFormatter {
     );
   }
 }
-// ================================================================
 
 class KalkulatorZakatPage extends StatefulWidget {
   const KalkulatorZakatPage({Key? key}) : super(key: key);
@@ -38,7 +37,7 @@ class KalkulatorZakatPage extends StatefulWidget {
 }
 
 class _KalkulatorZakatPageState extends State<KalkulatorZakatPage> {
-  // ... (semua variabel Anda tetap sama)
+  // --- VARIABEL STATE (TIDAK BERUBAH) ---
   final String _metalApiKey = "6f7f87826ae9ba492adcc6c885f1f831";
   final String _exchangeRateApiKey = "01573e01cd3549ecbc6f6651";
 
@@ -58,8 +57,9 @@ class _KalkulatorZakatPageState extends State<KalkulatorZakatPage> {
   final formatSAR =
       NumberFormat.currency(locale: 'en_SA', symbol: 'SAR ', decimalDigits: 2);
 
-  // ... (Fungsi _fetchGoldPricePerOunce dan _fetchCurrencyRates tetap sama)
+  // --- FUNGSI API (TIDAK BERUBAH) ---
   Future<double> _fetchGoldPricePerOunce() async {
+    // ... (logic tidak berubah)
     String url =
         "https://api.metalpriceapi.com/v1/latest?api_key=$_metalApiKey&base=USD&currencies=XAU";
     final response = await http.get(Uri.parse(url));
@@ -73,6 +73,7 @@ class _KalkulatorZakatPageState extends State<KalkulatorZakatPage> {
   }
 
   Future<Map<String, dynamic>> _fetchCurrencyRates() async {
+    // ... (logic tidak berubah)
     String url =
         "https://v6.exchangerate-api.com/v6/$_exchangeRateApiKey/latest/USD";
     final response = await http.get(Uri.parse(url));
@@ -86,6 +87,7 @@ class _KalkulatorZakatPageState extends State<KalkulatorZakatPage> {
     }
   }
 
+  // --- FUNGSI KALKULASI ---
   void _calculateZakat() async {
     setState(() {
       _isLoading = true;
@@ -108,14 +110,8 @@ class _KalkulatorZakatPageState extends State<KalkulatorZakatPage> {
       double nisabInUSD = 85 * goldPricePerGramUSD;
       double nisabInIDR = nisabInUSD * usdToIDRRate;
 
-      // ================================================================
-      // --- PERUBAHAN DI SINI (LANGKAH 2) ---
-      // ================================================================
-      // Teks dari controller akan berupa "200.000.000"
-      // Kita harus hapus titik-titiknya sebelum di-parse
       String cleanWealthText = _wealthController.text.replaceAll('.', '');
       double userWealthIDR = double.tryParse(cleanWealthText) ?? 0;
-      // ================================================================
 
       if (userWealthIDR >= nisabInIDR) {
         double zakatInIDR = userWealthIDR * 0.025;
@@ -131,7 +127,6 @@ class _KalkulatorZakatPageState extends State<KalkulatorZakatPage> {
           _zakatInSAR = zakatInSAR;
         });
       } else {
-        // ... (sisanya sama)
         setState(() {
           _statusMessage =
               "Kekayaan Anda belum mencapai Nisab. Belum wajib Zakat Maal.";
@@ -141,7 +136,7 @@ class _KalkulatorZakatPageState extends State<KalkulatorZakatPage> {
       }
     } catch (e) {
       setState(() {
-        _statusMessage = "Error: ${e.toString()}";
+        _statusMessage = "Error: Terjadi kesalahan saat mengambil data.";
       });
     } finally {
       setState(() {
@@ -152,82 +147,115 @@ class _KalkulatorZakatPageState extends State<KalkulatorZakatPage> {
 
   @override
   Widget build(BuildContext context) {
-    // ... (kode build Anda yang lain)
-    final Color primaryColor = Theme.of(context).primaryColor;
-    final Color scaffoldBackgroundColor =
-        Theme.of(context).scaffoldBackgroundColor;
-
     return Scaffold(
+      // 2. Terapkan warna background
+      backgroundColor: background,
       appBar: AppBar(
-        title: Text("Kalkulator Zakat Maal"),
-        backgroundColor: scaffoldBackgroundColor,
+        // 3. Terapkan style AppBar
+        title: Text(
+          "Kalkulator Zakat Maal",
+          style: GoogleFonts.poppins(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: background,
         elevation: 0,
-        automaticallyImplyLeading: false,
+        automaticallyImplyLeading: false, // Sesuai screenshot
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            // 4. Terapkan style Judul
             Text(
               "Hitung Zakat Maal Anda",
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              style: GoogleFonts.poppins(
+                color: Colors.white,
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-            SizedBox(height: 8),
-            Text(_statusMessage),
-            SizedBox(height: 20),
+            const SizedBox(height: 8),
+            // 5. Terapkan style Teks status
+            Text(
+              _statusMessage,
+              style: GoogleFonts.poppins(
+                color: text, // Warna teks abu-abu
+                fontSize: 14,
+              ),
+            ),
+            const SizedBox(height: 24),
 
-            // ================================================================
-            // --- PERUBAHAN DI SINI (LANGKAH 2) ---
-            // ================================================================
+            // 6. Terapkan style TextField
             TextField(
               controller: _wealthController,
               keyboardType: TextInputType.number,
-              // Tambahkan dua baris ini:
               inputFormatters: <TextInputFormatter>[
-                FilteringTextInputFormatter.digitsOnly, // Hanya izinkan angka
-                CurrencyInputFormatter(), // Terapkan formatter kita
+                FilteringTextInputFormatter.digitsOnly,
+                CurrencyInputFormatter(),
               ],
+              // Style untuk teks yang diketik user
+              style: GoogleFonts.poppins(color: Colors.white, fontSize: 16),
               decoration: InputDecoration(
-                labelText: "Total Kekayaan Anda (dalam IDR)",
-                // Hapus "Rp " dari sini agar tidak bentrok dengan formatter
-                // labelText: "Total Kekayaan Anda (dalam IDR)",
-                // prefixText: "Rp ", // Hapus ini
-                border: OutlineInputBorder(
+                labelText: "Total Kekayaan Anda (IDR)",
+                // Style untuk label
+                labelStyle: GoogleFonts.poppins(color: text),
+                // Tambahkan prefix "Rp "
+                prefixText: "Rp ",
+                prefixStyle: GoogleFonts.poppins(color: text, fontSize: 16),
+                // Ganti warna border
+                filled: true,
+                fillColor: gray, // Warna isi textfield
+                enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(
+                    color: gray, // Border saat tidak aktif
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(
+                    color: primary, // Border saat aktif (ungu)
+                  ),
                 ),
               ),
-              // Tambahkan prefix "Rp " di sini agar lebih rapi
-              style: TextStyle(fontSize: 16), // Sesuaikan style
             ),
-            // ================================================================
+            const SizedBox(height: 24),
 
-            SizedBox(height: 24),
-            // Tombol Hitung
+            // 7. Terapkan style Button
             ElevatedButton(
               onPressed: _isLoading ? null : _calculateZakat,
-              child: _isLoading
-                  ? CircularProgressIndicator(color: Colors.white)
-                  : Text("Hitung Zakat"), // <-- Teks ini akan muncul
               style: ElevatedButton.styleFrom(
-                backgroundColor: primaryColor, // Warna background tombol (Ungu)
-
-                // --- TAMBAHKAN BARIS INI ---
-                foregroundColor: Colors.white, // Warna Teks (Putih)
-                // --------------------------
-
-                padding: EdgeInsets.symmetric(vertical: 16),
-                textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                backgroundColor: primary, // Warna tombol ungu
+                foregroundColor: Colors.white, // Warna teks tombol
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12), // Samakan radiusnya
+                ),
+                textStyle: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
+              child: _isLoading
+                  ? const SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(color: Colors.white),
+                    )
+                  : const Text("Hitung Zakat"),
             ),
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
 
-            // ... (Tampilan Hasil tetap sama)
+            // 8. Terapkan style Card Hasil
             if (_nisabInIDR > 0)
-              Card(
-                // ...
+              Container(
+                decoration: BoxDecoration(
+                  color: gray, // Ganti Card dengan Container
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
@@ -235,21 +263,28 @@ class _KalkulatorZakatPageState extends State<KalkulatorZakatPage> {
                     children: [
                       Text(
                         "Hasil Perhitungan:",
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleLarge
-                            ?.copyWith(fontWeight: FontWeight.bold),
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                      Divider(height: 20),
+                      Divider(
+                        height: 24,
+                        color: text.withOpacity(0.2), // Warna divider
+                      ),
                       _buildResultRow(
                           "Nisab (85gr Emas):", formatIDR.format(_nisabInIDR)),
                       if (_zakatInIDR > 0) ...[
-                        SizedBox(height: 16),
+                        const SizedBox(height: 16),
                         Text(
                           "Total Zakat Anda (2.5%):",
-                          style: Theme.of(context).textTheme.titleMedium,
+                          style: GoogleFonts.poppins(
+                            color: text,
+                            fontSize: 16,
+                          ),
                         ),
-                        SizedBox(height: 8),
+                        const SizedBox(height: 8),
                         _buildResultRow(
                             "Dalam Rupiah:", formatIDR.format(_zakatInIDR)),
                         _buildResultRow(
@@ -267,16 +302,25 @@ class _KalkulatorZakatPageState extends State<KalkulatorZakatPage> {
     );
   }
 
-  // ... (Widget _buildResultRow tetap sama)
+  // 9. Terapkan style Font pada _buildResultRow
   Widget _buildResultRow(String title, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(title, style: TextStyle(fontSize: 16)),
-          Text(value,
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          Text(
+            title,
+            style: GoogleFonts.poppins(color: text, fontSize: 16),
+          ),
+          Text(
+            value,
+            style: GoogleFonts.poppins(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
         ],
       ),
     );

@@ -77,17 +77,23 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       } catch (e) {
         // Tangani error dari DatabaseHelper (misal: username/NIM sudah ada)
         setState(() {
-          _errorMessage = e.toString().replaceFirst('Exception: ', ''); // Tampilkan pesan error
+          _errorMessage = e
+              .toString()
+              .replaceFirst('Exception: ', ''); // Tampilkan pesan error
         });
       } finally {
         if (mounted) {
-           setState(() { _isLoading = false; });
+          setState(() {
+            _isLoading = false;
+          });
         }
       }
     } else {
-       if (mounted) {
-          setState(() { _isLoading = false; });
-       }
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -96,10 +102,16 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     return Scaffold(
       backgroundColor: background,
       appBar: AppBar(
-        title: Text("Registrasi Akun"),
+        title: Text(
+          "Registrasi Akun",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         backgroundColor: background,
         elevation: 0,
-        leading: IconButton( // Tombol back manual
+        leading: IconButton(
+          // Tombol back manual
           icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
@@ -130,7 +142,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               const SizedBox(height: 16),
               _buildPasswordField(_passwordController, "Password"),
               const SizedBox(height: 16),
-              _buildPasswordField(_confirmPasswordController, "Konfirmasi Password"),
+              _buildPasswordField(
+                  _confirmPasswordController, "Konfirmasi Password"),
               const SizedBox(height: 32),
               ElevatedButton(
                 onPressed: _isLoading ? null : _register,
@@ -141,7 +154,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   backgroundColor: primary,
                   foregroundColor: Colors.white,
                   padding: EdgeInsets.symmetric(vertical: 16),
-                  textStyle: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold),
+                  textStyle: GoogleFonts.poppins(
+                      fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ),
             ],
@@ -165,7 +179,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide.none,
         ),
-         enabledBorder: OutlineInputBorder(
+        enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide.none,
         ),
@@ -191,14 +205,14 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       style: TextStyle(color: Colors.white),
       decoration: InputDecoration(
         labelText: label,
-         labelStyle: TextStyle(color: text),
+        labelStyle: TextStyle(color: text),
         filled: true,
         fillColor: gray,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide.none,
         ),
-         enabledBorder: OutlineInputBorder(
+        enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide.none,
         ),
@@ -212,7 +226,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           return '$label tidak boleh kosong';
         }
         if (label == "Password" && value.length < 6) {
-           return 'Password minimal 6 karakter';
+          return 'Password minimal 6 karakter';
         }
         return null;
       },

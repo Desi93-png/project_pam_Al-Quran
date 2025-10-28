@@ -132,7 +132,14 @@ class _TimeConverterScreenState extends State<TimeConverterScreen> {
     return Scaffold(
       backgroundColor: background,
       appBar: AppBar(
-        title: Text("Jadwal Sholat Global"),
+        title: Text(
+          "Jadwal Sholat Global",
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            fontSize: 20,
+          ),
+        ),
         backgroundColor: background,
         elevation: 0,
         automaticallyImplyLeading: false,
