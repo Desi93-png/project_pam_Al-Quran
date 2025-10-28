@@ -13,6 +13,13 @@ import 'package:flutter_pam/screens/time_converter_screen.dart';
 import 'package:flutter_pam/screens/bookmark_screen.dart';
 import 'package:flutter_pam/screens/profile_screen.dart';
 
+// --- BARU: Import Search Delegate ---
+import 'package:flutter_pam/delegates/surah_search_delegate.dart'; // Sesuaikan path
+
+// ===================================================
+// Class HomeScreen Anda (Termasuk BottomNavBar)
+// TIDAK ADA PERUBAHAN DI SINI
+// ===================================================
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -27,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // Daftar halaman (urut sesuai bottom navigation)
   final List<Widget> _pages = [
     const HomeTabContent(), // Halaman utama (Quran)
-    const CurrencyConverterScreen(),
+    const KalkulatorZakatPage(),
     const TimeConverterScreen(),
     const BookmarkScreen(),
     const ProfileScreen(),
@@ -69,17 +76,19 @@ class _HomeScreenState extends State<HomeScreen> {
       BottomNavigationBarItem(
           icon: SvgPicture.asset(
             icon,
+            // ignore: deprecated_member_use
             color: text,
           ),
           activeIcon: SvgPicture.asset(
             icon,
+            // ignore: deprecated_member_use
             color: primary,
           ),
           label: label);
 }
 
 // ===================================================
-// Bagian ini tetap kode asli untuk halaman utama (Quran)
+// Class HomeTabContent (Dengan Modifikasi Search)
 // ===================================================
 class HomeTabContent extends StatelessWidget {
   const HomeTabContent({super.key});
@@ -88,7 +97,8 @@ class HomeTabContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: background,
-      appBar: _appBar(),
+      // --- MODIFIKASI: _appBar sekarang perlu 'context' ---
+      appBar: _appBar(context),
       body: DefaultTabController(
         length: 4,
         child: Padding(
@@ -118,6 +128,41 @@ class HomeTabContent extends StatelessWidget {
       ),
     );
   }
+
+  // --- MODIFIKASI: HAPUS 'static' DARI _appBar ---
+  // --- 'static' DIHAPUS agar bisa memanggil showSearch(context: context) ---
+  AppBar _appBar(BuildContext context) => AppBar(
+        backgroundColor: background,
+        automaticallyImplyLeading: false,
+        elevation: 0,
+        title: Row(children: [
+          IconButton(
+              onPressed: (() => {}),
+              icon: SvgPicture.asset('assets/svgs/menu-icon.svg')),
+          const SizedBox(width: 24),
+          Text(
+            'Quran App',
+            style: GoogleFonts.poppins(
+                fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+          ),
+          const Spacer(),
+          IconButton(
+              // --- MODIFIKASI: FUNGSI SEARCH DIISI ---
+              onPressed: () {
+                showSearch(
+                  context: context,
+                  delegate: SurahSearchDelegate(),
+                );
+              },
+              // ------------------------------------
+              icon: SvgPicture.asset('assets/svgs/search-icon.svg')),
+        ]),
+      );
+
+  // ===================================================
+  // --- TIDAK ADA PERUBAHAN DI BAWAH INI ---
+  // --- Metode ini TETAP STATIC agar tidak merusak kode Anda ---
+  // ===================================================
 
   // Untuk membuat tab bar
   static TabBar _tab() {
@@ -174,7 +219,11 @@ class HomeTabContent extends StatelessWidget {
               gradient: const LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  stops: [0, .6, 1],
+                  stops: [
+                    0,
+                    .6,
+                    1
+                  ],
                   colors: [
                     Color(0xFFDF98FA),
                     Color(0xFFB070FD),
@@ -195,7 +244,7 @@ class HomeTabContent extends StatelessWidget {
                   SvgPicture.asset('assets/svgs/book.svg'),
                   const SizedBox(width: 8),
                   Text(
-                    'Last Read',
+                    'Sudahkah Anda',
                     style: GoogleFonts.poppins(
                         color: Colors.white, fontWeight: FontWeight.w500),
                   ),
@@ -203,7 +252,7 @@ class HomeTabContent extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               Text(
-                'Al-Fatihah',
+                'Membaca Al-Quran',
                 style: GoogleFonts.poppins(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
@@ -211,7 +260,7 @@ class HomeTabContent extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                'Ayat No: 1',
+                'Hari ini?',
                 style: GoogleFonts.poppins(color: Colors.white),
               ),
             ],
@@ -220,25 +269,4 @@ class HomeTabContent extends StatelessWidget {
       ],
     );
   }
-
-  static AppBar _appBar() => AppBar(
-        backgroundColor: background,
-        automaticallyImplyLeading: false,
-        elevation: 0,
-        title: Row(children: [
-          IconButton(
-              onPressed: (() => {}),
-              icon: SvgPicture.asset('assets/svgs/menu-icon.svg')),
-          const SizedBox(width: 24),
-          Text(
-            'Quran App',
-            style: GoogleFonts.poppins(
-                fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
-          ),
-          const Spacer(),
-          IconButton(
-              onPressed: (() => {}),
-              icon: SvgPicture.asset('assets/svgs/search-icon.svg')),
-        ]),
-      );
 }
