@@ -5,15 +5,14 @@ import 'package:flutter_pam/globals.dart';
 import 'package:flutter_pam/tabs/surah_tab.dart';
 
 // --- Import Halaman Lain ---
-import 'package:flutter_pam/screens/currency_converter_screen.dart'; // KalkulatorZakatPage
+import 'package:flutter_pam/screens/currency_converter_screen.dart';
 import 'package:flutter_pam/screens/time_converter_screen.dart';
-import 'package:flutter_pam/screens/bookmark_screen.dart';
 import 'package:flutter_pam/screens/profile_screen.dart';
 
 // --- Import Tambahan ---
-import 'package:flutter_pam/delegates/surah_search_delegate.dart'; // Search
-import 'package:shared_preferences/shared_preferences.dart'; // Session
-import 'package:flutter_pam/helpers/database_helper.dart'; // Database
+import 'package:flutter_pam/delegates/surah_search_delegate.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_pam/helpers/database_helper.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -25,13 +24,10 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
-  // --- Daftar Halaman (Widget HomeTabContent SEKARANG perlu dibuat instance baru) ---
-  // Kita tidak bisa pakai 'const' lagi karena HomeTabContent jadi StatefulWidget
   final List<Widget> _pages = [
     HomeTabContent(), // Hapus 'const'
     const KalkulatorZakatPage(),
     const TimeConverterScreen(),
-    const BookmarkScreen(),
     const ProfileScreen(),
   ];
 
@@ -55,14 +51,8 @@ class _HomeScreenState extends State<HomeScreen> {
         onTap: _onItemTapped,
         items: [
           _bottomBarItem(icon: "assets/svgs/quran-icon.svg", label: "Quran"),
-          _bottomBarItem(
-              icon: "assets/svgs/money-icon.svg",
-              label: "Zakat"), // Ganti label jika perlu
-          _bottomBarItem(
-              icon: "assets/svgs/time-icon.svg",
-              label: "Sholat"), // Ganti label jika perlu
-          _bottomBarItem(
-              icon: "assets/svgs/bookmark-icon.svg", label: "Bookmark"),
+          _bottomBarItem(icon: "assets/svgs/money-icon.svg", label: "Zakat"),
+          _bottomBarItem(icon: "assets/svgs/time-icon.svg", label: "Sholat"),
           _bottomBarItem(
               icon: "assets/svgs/profile-icon.svg", label: "Profile"),
         ],
@@ -84,11 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
           label: label);
 }
 
-// ===================================================
-// --- HomeTabContent SEKARANG StatefulWidget ---
-// ===================================================
 class HomeTabContent extends StatefulWidget {
-  // Hapus 'const' dari constructor
   HomeTabContent({super.key});
 
   @override
@@ -97,7 +83,7 @@ class HomeTabContent extends StatefulWidget {
 
 class _HomeTabContentState extends State<HomeTabContent> {
   // --- State untuk menyimpan nama pengguna ---
-  String _userName = "Pengguna"; // Default name
+  String _userName = "Pengguna";
   bool _isLoadingName = true;
   final dbHelper = DatabaseHelper();
 
@@ -149,7 +135,7 @@ class _HomeTabContentState extends State<HomeTabContent> {
     }
   }
 
-  // --- Build Method (Tidak berubah signifikan) ---
+  // --- Build Method ---
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -185,7 +171,7 @@ class _HomeTabContentState extends State<HomeTabContent> {
     );
   }
 
-  // --- AppBar untuk HomeTabContent (Tidak Berubah) ---
+  // --- AppBar untuk HomeTabContent ---
   AppBar _appBar(BuildContext context) => AppBar(
         backgroundColor: background,
         automaticallyImplyLeading: false,
@@ -208,9 +194,6 @@ class _HomeTabContentState extends State<HomeTabContent> {
               icon: SvgPicture.asset('assets/svgs/search-icon.svg')),
         ]),
       );
-
-  // --- Widget-widget statis/helper untuk HomeTabContent ---
-  // Metode ini TIDAK perlu 'static' lagi karena dipanggil dari instance _HomeTabContentState
 
   TabBar _tab() {
     return TabBar(
@@ -249,7 +232,7 @@ class _HomeTabContentState extends State<HomeTabContent> {
           style: GoogleFonts.poppins(
               fontSize: 24, fontWeight: FontWeight.w600, color: Colors.white),
         ),
-        // ------------------------------------------
+
         const SizedBox(height: 24),
         _lastRead()
       ],

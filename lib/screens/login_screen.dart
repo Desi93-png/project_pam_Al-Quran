@@ -4,7 +4,7 @@ import 'package:flutter_pam/models/user_model.dart';
 import 'package:flutter_pam/screens/home_screen.dart'; // Untuk navigasi setelah login
 import 'package:flutter_pam/screens/registration_screen.dart'; // Untuk tombol Daftar
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_pam/globals.dart'; // Untuk warna
+import 'package:flutter_pam/globals.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -55,7 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
           Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (context) => const HomeScreen()),
-            (Route<dynamic> route) => false, // Hapus semua route sebelumnya
+            (Route<dynamic> route) => false,
           );
         } else {
           // Login Gagal (username atau password salah)
@@ -69,14 +69,18 @@ class _LoginScreenState extends State<LoginScreen> {
           _errorMessage = 'Terjadi kesalahan: ${e.toString()}';
         });
       } finally {
-         if (mounted) {
-           setState(() { _isLoading = false; });
-         }
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
       }
     } else {
-       if (mounted) {
-         setState(() { _isLoading = false; });
-       }
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -100,7 +104,6 @@ class _LoginScreenState extends State<LoginScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Ganti dengan logo atau gambar Anda jika ada
                 Icon(Icons.mosque, size: 80, color: primary),
                 const SizedBox(height: 24),
                 Text(
@@ -201,7 +204,7 @@ class _LoginScreenState extends State<LoginScreen> {
         borderRadius: BorderRadius.circular(10),
         borderSide: BorderSide.none,
       ),
-       enabledBorder: OutlineInputBorder(
+      enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
         borderSide: BorderSide.none,
       ),
