@@ -84,6 +84,10 @@ class DetailScreen extends StatelessWidget {
                   const SizedBox(
                     width: 16,
                   ),
+                  const Icon(
+                    Icons.bookmark_outline,
+                    color: Colors.white,
+                  ),
                 ],
               ),
             ),
@@ -226,9 +230,6 @@ class DetailScreen extends StatelessWidget {
                 GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           const Spacer(),
-          IconButton(
-              onPressed: (() => {}),
-              icon: SvgPicture.asset('assets/svgs/search-icon.svg')),
         ]),
       );
 }

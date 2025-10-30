@@ -1,3 +1,5 @@
+// Salin dan timpa seluruh file: android/app/build.gradle.kts
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -13,6 +15,10 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+        
+        // --- 1. TAMBAHKAN BARIS INI (sintaks .kts) ---
+        isCoreLibraryDesugaringEnabled = true
+        // ---------------------------------------------
     }
 
     kotlinOptions {
@@ -20,11 +26,13 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.example.flutter_pam"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
+        
+        // --- 2. UBAH BARIS INI ---
+        // Notifikasi memerlukan minimal SDK 21
+        minSdk = flutter.minSdkVersion 
+        // -------------------------
+
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
@@ -42,3 +50,10 @@ android {
 flutter {
     source = "../.."
 }
+
+// --- 3. TAMBAHKAN BLOK INI DI PALING BAWAH ---
+dependencies {
+    // Menambahkan dependensi untuk core library desugaring
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
+}
+// ---------------------------------------------

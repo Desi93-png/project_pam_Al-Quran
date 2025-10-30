@@ -43,6 +43,8 @@ dependencies:
   crypto: ^3.0.3 # <-- Enkripsi (Hashing) password
   geolocator: ^12.0.0 # Cek versi terbaru di pub.dev
   geocoding: ^3.0.0 # Cek versi terbaru di pub.dev
+  flutter_local_notifications: ^17.2.1+1 # Cek versi terbaru
+  timezone: ^0.9.4                       # Cek versi terbaru
   cupertino_icons: ^1.0.2
 
 dev_dependencies:

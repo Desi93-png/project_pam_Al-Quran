@@ -7,6 +7,7 @@ import 'package:flutter_pam/tabs/surah_tab.dart';
 // --- Import Halaman Lain ---
 import 'package:flutter_pam/screens/currency_converter_screen.dart';
 import 'package:flutter_pam/screens/time_converter_screen.dart';
+import 'package:flutter_pam/screens/bookmark_screen.dart';
 import 'package:flutter_pam/screens/profile_screen.dart';
 
 // --- Import Tambahan ---
@@ -28,6 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
     HomeTabContent(), // Hapus 'const'
     const KalkulatorZakatPage(),
     const TimeConverterScreen(),
+    const BookmarkScreen(),
     const ProfileScreen(),
   ];
 
@@ -53,6 +55,8 @@ class _HomeScreenState extends State<HomeScreen> {
           _bottomBarItem(icon: "assets/svgs/quran-icon.svg", label: "Quran"),
           _bottomBarItem(icon: "assets/svgs/money-icon.svg", label: "Zakat"),
           _bottomBarItem(icon: "assets/svgs/time-icon.svg", label: "Sholat"),
+          _bottomBarItem(
+              icon: "assets/svgs/bookmark-icon.svg", label: "Bookmark"),
           _bottomBarItem(
               icon: "assets/svgs/profile-icon.svg", label: "Profile"),
         ],

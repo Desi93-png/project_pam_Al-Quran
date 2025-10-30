@@ -44,7 +44,7 @@ class DatabaseHelper {
         -- foto_path TEXT
       )
     ''');
-     // Tambahkan tabel lain jika perlu (misal: bookmarks, saran_kesan)
+    // Tambahkan tabel lain jika perlu (misal: bookmarks, saran_kesan)
   }
 
   // --- Fungsi Hashing Password ---
@@ -60,8 +60,9 @@ class DatabaseHelper {
   Future<int> registerUser(User user) async {
     Database db = await database;
     // Hash password sebelum disimpan
-    String hashedPassword = _hashPassword(user.password); // Gunakan password asli dari model
-    
+    String hashedPassword =
+        _hashPassword(user.password); // Gunakan password asli dari model
+
     // Buat Map baru tanpa password asli, ganti dengan hash
     Map<String, dynamic> userMap = {
       'namaLengkap': user.namaLengkap,
@@ -72,16 +73,16 @@ class DatabaseHelper {
     };
 
     try {
-       return await db.insert('users', userMap);
+      return await db.insert('users', userMap);
     } catch (e) {
       // Tangani error jika username atau NIM sudah ada (UNIQUE constraint failed)
       print('Error saat registrasi: $e');
       if (e.toString().contains('UNIQUE constraint failed: users.username')) {
         throw Exception('Username sudah digunakan.');
       } else if (e.toString().contains('UNIQUE constraint failed: users.nim')) {
-         throw Exception('NIM sudah terdaftar.');
+        throw Exception('NIM sudah terdaftar.');
       } else {
-         throw Exception('Registrasi gagal, terjadi kesalahan.');
+        throw Exception('Registrasi gagal, terjadi kesalahan.');
       }
     }
   }
@@ -104,7 +105,7 @@ class DatabaseHelper {
       userMap.remove('passwordHash'); // Jangan kirim hash ke UI
       // Kita perlu membuat User model dari map ini, TAPI password asli tidak ada
       // Jadi kita buat User model tanpa password asli
-      return User.fromDbMap(userMap); 
+      return User.fromDbMap(userMap);
     } else {
       // Jika tidak ditemukan (username atau password salah)
       return null;
@@ -113,20 +114,17 @@ class DatabaseHelper {
 
   // (Opsional) Ambil data user berdasarkan ID (misal untuk halaman profil)
   Future<User?> getUserById(int id) async {
-     Database db = await database;
-     List<Map<String, dynamic>> maps = await db.query(
+    Database db = await database;
+    List<Map<String, dynamic>> maps = await db.query(
       'users',
       where: 'id = ?',
       whereArgs: [id],
     );
-     if (maps.isNotEmpty) {
+    if (maps.isNotEmpty) {
       Map<String, dynamic> userMap = Map.from(maps.first);
       userMap.remove('passwordHash');
       return User.fromDbMap(userMap);
-     }
-     return null;
+    }
+    return null;
   }
-
-   // --- Tambahkan fungsi CRUD lain di sini ---
-   // Misal: updateUser, deleteUser, dll.
 }
