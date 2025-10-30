@@ -22,6 +22,10 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
   String? _errorMessage;
 
+  // --- 1. TAMBAHKAN STATE UNTUK VISIBILITY PASSWORD ---
+  bool _isPasswordVisible = false;
+  // --- Akhir Perubahan 1 ---
+
   final dbHelper = DatabaseHelper();
 
   @override
@@ -32,6 +36,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _login() async {
+    // ... (Fungsi login Anda tidak berubah)
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -46,25 +51,21 @@ class _LoginScreenState extends State<LoginScreen> {
 
         if (user != null && user.id != null) {
           // Login Berhasil!
-
-          // 1. Simpan session (userId)
           final prefs = await SharedPreferences.getInstance();
-          await prefs.setInt('userId', user.id!); // Simpan ID pengguna
+          await prefs.setInt('userId', user.id!); 
 
-          // 2. Navigasi ke HomeScreen dan hapus semua halaman sebelumnya
           Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (context) => const HomeScreen()),
             (Route<dynamic> route) => false,
           );
         } else {
-          // Login Gagal (username atau password salah)
+          // Login Gagal
           setState(() {
             _errorMessage = 'Username atau password salah.';
           });
         }
       } catch (e) {
-        // Tangani error lain jika ada
         setState(() {
           _errorMessage = 'Terjadi kesalahan: ${e.toString()}';
         });
@@ -85,6 +86,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _goToRegistration() {
+    // ... (Fungsi ini tidak berubah)
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const RegistrationScreen()),
@@ -132,7 +134,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
 
-                // Username Field
+                // Username Field (Tidak berubah)
                 TextFormField(
                   controller: _usernameController,
                   style: TextStyle(color: Colors.white),
@@ -146,12 +148,30 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                // Password Field
+                // --- 2. MODIFIKASI PASSWORD FIELD ---
                 TextFormField(
                   controller: _passwordController,
-                  obscureText: true,
+                  // Gunakan state _isPasswordVisible
+                  obscureText: !_isPasswordVisible, 
                   style: TextStyle(color: Colors.white),
-                  decoration: _inputDecoration("Password"),
+                  // Gunakan .copyWith untuk MENAMBAHKAN suffixIcon
+                  decoration: _inputDecoration("Password").copyWith(
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        // Ganti ikon berdasarkan state
+                        _isPasswordVisible
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                        color: text, // Beri warna ikon
+                      ),
+                      onPressed: () {
+                        // Panggil setState untuk toggle state
+                        setState(() {
+                          _isPasswordVisible = !_isPasswordVisible;
+                        });
+                      },
+                    ),
+                  ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Password tidak boleh kosong';
@@ -159,9 +179,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     return null;
                   },
                 ),
+                // --- Akhir Perubahan 2 ---
+
                 const SizedBox(height: 32),
 
-                // Tombol Login
+                // Tombol Login (Tidak berubah)
                 ElevatedButton(
                   onPressed: _isLoading ? null : _login,
                   child: _isLoading
@@ -177,7 +199,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                // Tombol ke Halaman Registrasi
+                // Tombol ke Halaman Registrasi (Tidak berubah)
                 TextButton(
                   onPressed: _goToRegistration,
                   child: Text(
@@ -193,7 +215,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  // Helper untuk InputDecoration
+  // Helper untuk InputDecoration (Tidak berubah)
   InputDecoration _inputDecoration(String label) {
     return InputDecoration(
       labelText: label,
