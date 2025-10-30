@@ -7,7 +7,13 @@ import 'package:flutter_pam/models/surah.dart';
 import 'package:flutter_pam/screens/detail_screen.dart';
 
 class SurahTab extends StatelessWidget {
-  const SurahTab({super.key});
+  // --- MODIFIKASI 1: Tambahkan final int? userId ---
+  // Kita buat nullable 'int?' karena 'HomeTabContent' mungkin
+  // mengirim null saat pertama kali loading.
+  final int? userId;
+
+  // --- MODIFIKASI 2: Terima userId di constructor ---
+  const SurahTab({super.key, required this.userId});
 
   Future<List<Surah>> _getSurahList() async {
     String data = await rootBundle.loadString('assets/datas/list-surah.json');
@@ -25,26 +31,45 @@ class SurahTab extends StatelessWidget {
           }
           return ListView.separated(
               itemBuilder: (context, index) => _surahItem(
-                  context: context, surah: snapshot.data!.elementAt(index)),
+                  context: context,
+                  surah: snapshot.data!.elementAt(index),
+                  // --- MODIFIKASI 3: Kirim userId ke _surahItem ---
+                  userId: userId),
               separatorBuilder: (context, index) =>
                   Divider(color: const Color(0xFF7B80AD).withOpacity(.35)),
               itemCount: snapshot.data!.length);
         }));
-        // Divider untuk memberi garis batas
   }
 
-  Widget _surahItem({required Surah surah, required BuildContext context}) =>
+  // --- MODIFIKASI 4: Terima userId di _surahItem ---
+  Widget _surahItem({
+    required Surah surah,
+    required BuildContext context,
+    required int? userId, // Tambahkan ini
+  }) =>
       GestureDetector(
         behavior: HitTestBehavior.opaque,
+        // --- MODIFIKASI 5: Perbarui logika onTap ---
         onTap: () {
-          Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => DetailScreen(
-                    noSurat: surah.nomor,
-                  )));
+          // Cek dulu apakah userId sudah ada (tidak null)
+          if (userId != null) {
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => DetailScreen(
+                      noSurat: surah.nomor,
+                      userId: userId, // Kirim userId ke DetailScreen
+                    )));
+          } else {
+            // Jika userId null (masih loading), tampilkan pesan
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Gagal memuat data user, coba lagi.'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
         },
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 16),
-          // Pakai Row karena mendatar
           child: Row(
             children: [
               Stack(
@@ -65,11 +90,8 @@ class SurahTab extends StatelessWidget {
               const SizedBox(
                 width: 16,
               ),
-              
-              // Expanded ini untuk membungkus nama latin surat dan keterangan singkat
               Expanded(
                   child: Column(
-                // Supaya di sebelah kiri
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
@@ -84,7 +106,6 @@ class SurahTab extends StatelessWidget {
                   ),
                   Row(
                     children: [
-                      // Untuk memberi nama tempat turun
                       Text(
                         surah.tempatTurun.name,
                         style: GoogleFonts.poppins(
@@ -95,7 +116,6 @@ class SurahTab extends StatelessWidget {
                       const SizedBox(
                         width: 5,
                       ),
-                      // Untuk memberi titik
                       Container(
                         width: 4,
                         height: 4,
@@ -106,7 +126,6 @@ class SurahTab extends StatelessWidget {
                       const SizedBox(
                         width: 5,
                       ),
-                      // Unruk memberi jumlah ayat
                       Text(
                         "${surah.jumlahAyat} Ayat",
                         style: GoogleFonts.poppins(
@@ -120,7 +139,6 @@ class SurahTab extends StatelessWidget {
               )),
               Text(
                 surah.nama,
-                // Font amiri untuk jadi tulisan Arab
                 style: GoogleFonts.amiri(
                     color: primary, fontSize: 20, fontWeight: FontWeight.bold),
               ),

@@ -5,7 +5,8 @@ import 'package:flutter_pam/globals.dart';
 import 'package:flutter_pam/tabs/surah_tab.dart';
 
 // --- Import Halaman Lain ---
-import 'package:flutter_pam/screens/currency_converter_screen.dart';
+// (Saya asumsikan import ini benar sesuai nama file Anda)
+import 'package:flutter_pam/screens/currency_converter_screen.dart'; 
 import 'package:flutter_pam/screens/time_converter_screen.dart';
 import 'package:flutter_pam/screens/bookmark_screen.dart';
 import 'package:flutter_pam/screens/profile_screen.dart';
@@ -25,8 +26,10 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
-  final List<Widget> _pages = [
-    HomeTabContent(), // Hapus 'const'
+  // --- MODIFIKASI: _pages tidak bisa const lagi ---
+  // Kita perlu memperbarui _pages saat userId sudah dimuat
+  List<Widget> _pages = [
+    HomeTabContent(userId: null), // Mulai dengan userId null
     const KalkulatorZakatPage(),
     const TimeConverterScreen(),
     const BookmarkScreen(),
@@ -38,6 +41,33 @@ class _HomeScreenState extends State<HomeScreen> {
       _selectedIndex = index;
     });
   }
+
+  // --- FUNGSI UNTUK MENGAMBIL USERID SAAT HOMESCREEN DIBUAT ---
+  // Ini penting agar kita bisa mengirimkannya ke semua tab
+  @override
+  void initState() {
+    super.initState();
+    _loadUserAndSetupPages();
+  }
+
+  Future<void> _loadUserAndSetupPages() async {
+    final prefs = await SharedPreferences.getInstance();
+    final int? userId = prefs.getInt('userId');
+    
+    // Setelah userId didapat, bangun ulang _pages dengan userId yang benar
+    if (mounted) {
+      setState(() {
+        _pages = [
+          HomeTabContent(userId: userId), // Kirim userId ke HomeTabContent
+          const KalkulatorZakatPage(),
+          const TimeConverterScreen(),
+          const BookmarkScreen(),
+          const ProfileScreen(),
+        ];
+      });
+    }
+  }
+  // --- AKHIR MODIFIKASI ---
 
   @override
   Widget build(BuildContext context) {
@@ -79,50 +109,54 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class HomeTabContent extends StatefulWidget {
-  HomeTabContent({super.key});
+  // --- MODIFIKASI: Terima userId dari HomeScreen ---
+  final int? userId;
+  HomeTabContent({super.key, required this.userId});
 
   @override
   State<HomeTabContent> createState() => _HomeTabContentState();
 }
 
 class _HomeTabContentState extends State<HomeTabContent> {
-  // --- State untuk menyimpan nama pengguna ---
   String _userName = "Pengguna";
   bool _isLoadingName = true;
   final dbHelper = DatabaseHelper();
+  
+  // Hapus _currentUserId, kita sekarang pakai 'widget.userId'
+  // int? _currentUserId; 
 
   @override
   void initState() {
     super.initState();
-    _loadUserName(); // Panggil fungsi load nama saat widget dibuat
+    // Gunakan 'widget.userId' yang dikirim dari HomeScreen
+    _loadUserName(widget.userId); 
   }
 
-  // --- Fungsi untuk memuat nama pengguna ---
-  Future<void> _loadUserName() async {
+  // --- MODIFIKASI: Terima userId sebagai parameter ---
+  Future<void> _loadUserName(int? userId) async {
     if (!mounted) return;
     setState(() {
       _isLoadingName = true;
     });
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final int? userId = prefs.getInt('userId');
+      // Tidak perlu ambil dari SharedPreferences lagi, sudah dikirim
+      // final prefs = await SharedPreferences.getInstance();
+      // final int? userId = prefs.getInt('userId');
+      
       if (userId != null) {
         final user = await dbHelper.getUserById(userId);
         if (user != null && mounted) {
           setState(() {
-            // Ambil nama lengkap dari user
             _userName = user.namaLengkap;
             _isLoadingName = false;
           });
         } else if (mounted) {
-          // User tidak ditemukan di DB
           setState(() {
             _userName = "Pengguna";
             _isLoadingName = false;
           });
         }
       } else if (mounted) {
-        // User ID tidak ada di session
         setState(() {
           _userName = "Pengguna";
           _isLoadingName = false;
@@ -134,24 +168,22 @@ class _HomeTabContentState extends State<HomeTabContent> {
         setState(() {
           _userName = "Pengguna";
           _isLoadingName = false;
-        }); // Fallback jika error
+        });
       }
     }
   }
 
-  // --- Build Method ---
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: background,
-      appBar: _appBar(context), // Panggil _appBar (NON-STATIC)
+      appBar: _appBar(context), 
       body: DefaultTabController(
-        length: 4,
+        length: 1, 
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: NestedScrollView(
             headerSliverBuilder: (context, innerBoxIsScrolled) => [
-              // --- Kirim nama pengguna ke _greeting ---
               SliverToBoxAdapter(child: _greeting(_userName, _isLoadingName)),
               SliverAppBar(
                 pinned: true,
@@ -168,14 +200,16 @@ class _HomeTabContentState extends State<HomeTabContent> {
                 ),
               )
             ],
-            body: const TabBarView(children: [SurahTab()]),
+            // --- MODIFIKASI: Kirim userId ke SurahTab ---
+            body: TabBarView(children: [
+              SurahTab(userId: widget.userId) // Kirim userId ke tab
+            ]), 
           ),
         ),
       ),
     );
   }
 
-  // --- AppBar untuk HomeTabContent ---
   AppBar _appBar(BuildContext context) => AppBar(
         backgroundColor: background,
         automaticallyImplyLeading: false,
@@ -190,10 +224,20 @@ class _HomeTabContentState extends State<HomeTabContent> {
           const Spacer(),
           IconButton(
               onPressed: () {
-                showSearch(
-                  context: context,
-                  delegate: SurahSearchDelegate(),
-                );
+                // --- MODIFIKASI: Gunakan 'widget.userId' ---
+                if (widget.userId != null) {
+                  showSearch(
+                    context: context,
+                    delegate: SurahSearchDelegate(userId: widget.userId!),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Masih memuat data user, coba sesaat lagi."),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
               },
               icon: SvgPicture.asset('assets/svgs/search-icon.svg')),
         ]),
@@ -219,8 +263,8 @@ class _HomeTabContentState extends State<HomeTabContent> {
     );
   }
 
-  // --- Modifikasi _greeting untuk menerima nama ---
   Column _greeting(String userName, bool isLoading) {
+    // ... (kode _greeting tidak berubah)
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -230,13 +274,11 @@ class _HomeTabContentState extends State<HomeTabContent> {
               fontSize: 18, fontWeight: FontWeight.w500, color: text),
         ),
         const SizedBox(height: 4),
-        // --- Tampilkan nama dinamis atau loading ---
         Text(
-          isLoading ? "Memuat..." : userName, // Tampilkan nama atau loading
+          isLoading ? "Memuat..." : userName,
           style: GoogleFonts.poppins(
               fontSize: 24, fontWeight: FontWeight.w600, color: Colors.white),
         ),
-
         const SizedBox(height: 24),
         _lastRead()
       ],
@@ -244,6 +286,7 @@ class _HomeTabContentState extends State<HomeTabContent> {
   }
 
   Stack _lastRead() {
+    // ... (kode _lastRead tidak berubah)
     return Stack(
       children: [
         Container(
