@@ -9,19 +9,20 @@ Future<void> main() async {
   // Pastikan Flutter binding sudah siap
   WidgetsFlutterBinding.ensureInitialized();
 
-  // --- Inisialisasi dan jadwalkan notifikasi ---
+  // --- Inisialisasi (TANPA PENJADWALAN OTOMATIS) ---
   try {
-    tz.initializeTimeZones(); // Inisialisasi database timezone
+    tz.initializeTimeZones(); // Inisialisasi database timezone (DIBUTUHKAN)
     print("Timezones Initialized.");
-    
-    await NotificationService().initNotification(); // Inisialisasi plugin
+
+    await NotificationService().initNotification(); // Inisialisasi plugin (WAJIB)
     print("Notification Service Initialized.");
-    
-    // Tetap jadwalkan notifikasi harian (untuk Laporan)
-    await NotificationService().scheduleDailyReminderNotification(); 
-    
+
+    // --- BARIS INI TELAH DIHAPUS ---
+    // await NotificationService().scheduleDailyReminderNotification();
+    // --- AKHIR PERUBAHAN ---
+
   } catch (e) {
-     debugPrint("Error saat setup notifikasi: $e"); // Cetak error jika gagal
+    debugPrint("Error saat setup notifikasi: $e"); // Cetak error jika gagal
   }
   // --------------------------------------------------
 
@@ -37,9 +38,7 @@ class MyApp extends StatelessWidget {
       title: 'Quran Now',
       theme: ThemeData(
         brightness: Brightness.dark,
-        // TODO: Atur tema global Anda di sini
       ),
-      // Mulai dari SplashScreen (yang akan cek login)
       home: const SplashScreen(),
     );
   }

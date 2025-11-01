@@ -1,5 +1,3 @@
-// Salin dan timpa seluruh file: lib/services/notification_service.dart
-
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
@@ -47,7 +45,7 @@ class NotificationService {
           ),
           iOS: DarwinNotificationDetails());
 
-  // --- BARU: Daftar Ayat Pilihan (Silakan Tambah/Ubah Sesuai Keinginan) ---
+  // --- BARU: Daftar Ayat Pilihan (Tidak Diubah) ---
   final List<AyatPilihan> _ayatPilihanList = [
     AyatPilihan(
         surah: "Al-Baqarah",
@@ -137,15 +135,13 @@ class NotificationService {
     debugPrint('NOTIFICATION PAYLOAD: ${notificationResponse.payload}');
   }
 
-  // --- FUNGSI 1: Penjadwalan Harian (DIUBAH) ---
+  // --- FUNGSI 1: Penjadwalan Harian (Tidak Diubah) ---
   Future<void> scheduleDailyReminderNotification() async {
     print("Mencoba menjadwalkan 'Ayat Harian'...");
 
-    // --- BARU: Pilih Ayat Acak ---
     final random = Random();
     final AyatPilihan ayat =
         _ayatPilihanList[random.nextInt(_ayatPilihanList.length)];
-    // ----------------------------
 
     final String notifTitle =
         "📖 Ayat Hari Ini (${ayat.surah} : ${ayat.ayatKe})";
@@ -160,8 +156,8 @@ class NotificationService {
 
     await flutterLocalNotificationsPlugin.zonedSchedule(
         0, // ID 0 untuk notifikasi harian
-        notifTitle, // --- DIUBAH ---
-        notifBody, // --- DIUBAH ---
+        notifTitle, 
+        notifBody, 
         scheduledDate,
         _platformChannelSpecifics,
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
@@ -172,15 +168,13 @@ class NotificationService {
         "Notifikasi Ayat Harian ($notifTitle) berhasil dijadwalkan untuk $scheduledDate");
   }
 
-  // --- FUNGSI 2: Tombol Demo (DIUBAH) ---
+  // --- FUNGSI 2: Tombol Demo (Tidak Diubah) ---
   Future<void> showNowReminderNotification() async {
     print("Menampilkan notifikasi demo 'Ayat Harian'...");
 
-    // --- BARU: Pilih Ayat Acak ---
     final random = Random();
     final AyatPilihan ayat =
         _ayatPilihanList[random.nextInt(_ayatPilihanList.length)];
-    // ----------------------------
 
     final String notifTitle =
         "📖 Ayat Hari Ini (${ayat.surah} : ${ayat.ayatKe})";
@@ -188,10 +182,29 @@ class NotificationService {
 
     await flutterLocalNotificationsPlugin.show(
         1, // ID 1 untuk notifikasi instan
-        notifTitle, // --- DIUBAH ---
-        notifBody, // --- DIUBAH ---
+        notifTitle, 
+        notifBody, 
         _platformChannelSpecifics,
         payload: 'ayat_harian_demo_payload');
     print("Notifikasi instan '$notifTitle' berhasil ditampilkan.");
   }
+  
+  // --- TAMBAHAN BARU: FUNGSI UNTUK BOOKMARK ---
+  /// Menampilkan notifikasi instan sederhana
+  Future<void> showSimpleNotification({
+    required int id,
+    required String title,
+    required String body,
+    String payload = '',
+  }) async {
+    // Menggunakan _platformChannelSpecifics yang sudah Anda definisikan
+    await flutterLocalNotificationsPlugin.show(
+      id,
+      title,
+      body,
+      _platformChannelSpecifics, // Menggunakan channel yang sama
+      payload: payload,
+    );
+  }
+  // --- AKHIR TAMBAHAN ---
 }
