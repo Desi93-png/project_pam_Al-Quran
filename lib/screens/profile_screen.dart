@@ -201,7 +201,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         const SizedBox(height: 8),
         Text(
-          'Aplikasi ini sangat membantu untuk membaca Al-Qur\'an secara digital. Tampilan antarmukanya menarik, dan fitur navigasi antar Surah maupun Juz mudah digunakan. Semoga ke depan bisa ditambahkan fitur bookmark dan tafsir ayat agar semakin lengkap.',
+          'Mungkin saran dari saya terkait Mata Kuliah PAM adalah untuk deadline tugas akhir diberitahu sejak awal masuk kuliah supaya mahasiswa bisa lebih bersiap-siap dan mengatur jadwal akademik maupun non akademik dengan lebih efektif dan efisien',
           textAlign: TextAlign.justify,
           style: GoogleFonts.poppins(
               color: Colors.white.withOpacity(0.8), fontSize: 14),
@@ -219,7 +219,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         const SizedBox(height: 8),
         Text(
-          'Aplikasi ini sangat membantu untuk membaca Al-Qur\'an secara digital. Tampilan antarmukanya menarik, dan fitur navigasi antar Surah maupun Juz mudah digunakan. Semoga ke depan bisa ditambahkan fitur bookmark dan tafsir ayat agar semakin lengkap.',
+          'Kesan dari saya yaitu Mata Kuliah PAM keren sekali karena saya tidak menyangka saya bisa melangkah sejauh ini. Selain itu, dari dulu saya bertanya-tanya bagaimana cara pengguna berinteraksi dengan aplikasi, dan akhirnya sekarang saya sudah melakukannya',
           textAlign: TextAlign.justify,
           style: GoogleFonts.poppins(
               color: Colors.white.withOpacity(0.8), fontSize: 14),

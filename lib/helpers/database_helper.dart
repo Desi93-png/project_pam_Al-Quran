@@ -168,9 +168,7 @@ class DatabaseHelper {
   }
 
   // --- FUNGSI BARU UNTUK HALAMAN BOOKMARK SCREEN ---
-  // (Ini yang ditambahkan dari respons saya sebelumnya)
 
-  /// Mengambil semua bookmark milik seorang user (untuk halaman BookmarkScreen)
   Future<List<Bookmark>> getAllUserBookmarks(int userId) async {
     Database db = await database;
     List<Map<String, dynamic>> maps = await db.query(

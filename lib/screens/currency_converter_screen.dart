@@ -91,7 +91,7 @@ class _KalkulatorZakatPageState extends State<KalkulatorZakatPage> {
     // --- PERUBAHAN 2: Menambahkan validasi input kosong ---
     if (_wealthController.text.isEmpty) {
       setState(() {
-        _statusMessage = "mohon masukkan total kekayaan Anda.";
+        _statusMessage = "Mohon masukkan total kekayaan Anda.";
         _nisabInIDR = 0; // Sembunyikan card hasil jika input kosong
         _zakatInIDR = 0;
       });

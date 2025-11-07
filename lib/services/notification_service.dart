@@ -156,8 +156,8 @@ class NotificationService {
 
     await flutterLocalNotificationsPlugin.zonedSchedule(
         0, // ID 0 untuk notifikasi harian
-        notifTitle, 
-        notifBody, 
+        notifTitle,
+        notifBody,
         scheduledDate,
         _platformChannelSpecifics,
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
@@ -182,13 +182,13 @@ class NotificationService {
 
     await flutterLocalNotificationsPlugin.show(
         1, // ID 1 untuk notifikasi instan
-        notifTitle, 
-        notifBody, 
+        notifTitle,
+        notifBody,
         _platformChannelSpecifics,
         payload: 'ayat_harian_demo_payload');
     print("Notifikasi instan '$notifTitle' berhasil ditampilkan.");
   }
-  
+
   // --- TAMBAHAN BARU: FUNGSI UNTUK BOOKMARK ---
   /// Menampilkan notifikasi instan sederhana
   Future<void> showSimpleNotification({

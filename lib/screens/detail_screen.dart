@@ -212,13 +212,8 @@ class _DetailScreenState extends State<DetailScreen> {
     );
   }
 
-  // Widget _details (Tidak Berubah)
-
   Widget _details({required Surah surah}) => Padding(
-        //... (kode _details tidak berubah)
-
         padding: const EdgeInsets.symmetric(horizontal: 24),
-
         child: Stack(children: [
           Container(
             height: 257,
