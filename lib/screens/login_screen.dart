@@ -16,27 +16,26 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _usernameController = TextEditingController();
+  // --- DIUBAH: Ganti nama variabel ---
+  final _emailController = TextEditingController(); // <-- DIGANTI
+  // ------------------------------------
   final _passwordController = TextEditingController();
 
   bool _isLoading = false;
   String? _errorMessage;
 
-  // --- 1. TAMBAHKAN STATE UNTUK VISIBILITY PASSWORD ---
   bool _isPasswordVisible = false;
-  // --- Akhir Perubahan 1 ---
 
   final dbHelper = DatabaseHelper();
 
   @override
   void dispose() {
-    _usernameController.dispose();
+    _emailController.dispose(); // <-- DIGANTI
     _passwordController.dispose();
     super.dispose();
   }
 
   void _login() async {
-    // ... (Fungsi login Anda tidak berubah)
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -45,14 +44,14 @@ class _LoginScreenState extends State<LoginScreen> {
     if (_formKey.currentState!.validate()) {
       try {
         User? user = await dbHelper.loginUser(
-          _usernameController.text,
+          _emailController.text, // <-- DIGANTI
           _passwordController.text,
         );
 
         if (user != null && user.id != null) {
           // Login Berhasil!
           final prefs = await SharedPreferences.getInstance();
-          await prefs.setInt('userId', user.id!); 
+          await prefs.setInt('userId', user.id!);
 
           Navigator.pushAndRemoveUntil(
             context,
@@ -62,7 +61,7 @@ class _LoginScreenState extends State<LoginScreen> {
         } else {
           // Login Gagal
           setState(() {
-            _errorMessage = 'Username atau password salah.';
+            _errorMessage = 'Email atau password salah.';
           });
         }
       } catch (e) {
@@ -86,7 +85,6 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _goToRegistration() {
-    // ... (Fungsi ini tidak berubah)
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const RegistrationScreen()),
@@ -134,38 +132,42 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
 
-                // Username Field (Tidak berubah)
+                // --- PERBAIKAN UNTUK FIELD EMAIL ---
                 TextFormField(
-                  controller: _usernameController,
+                  controller: _emailController, // <-- DIGANTI
                   style: TextStyle(color: Colors.white),
-                  decoration: _inputDecoration("Username"),
-                  validator: (value) {
+                  keyboardType: TextInputType.emailAddress, // <-- 1. TAMBAHKAN KEYBOARD
+                  decoration: _inputDecoration("Email"),
+                  validator: (value) { // <-- 2. TAMBAHKAN VALIDASI EMAIL
                     if (value == null || value.isEmpty) {
-                      return 'Username tidak boleh kosong';
+                      return 'Email tidak boleh kosong';
+                    }
+                    final emailRegex =
+                        RegExp(r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
+                    if (!emailRegex.hasMatch(value)) {
+                      return 'Masukkan format email yang valid';
                     }
                     return null;
                   },
                 ),
+                // --- AKHIR PERBAIKAN ---
+
                 const SizedBox(height: 16),
 
-                // --- 2. MODIFIKASI PASSWORD FIELD ---
+                // --- Password Field (Sudah benar) ---
                 TextFormField(
                   controller: _passwordController,
-                  // Gunakan state _isPasswordVisible
-                  obscureText: !_isPasswordVisible, 
+                  obscureText: !_isPasswordVisible,
                   style: TextStyle(color: Colors.white),
-                  // Gunakan .copyWith untuk MENAMBAHKAN suffixIcon
                   decoration: _inputDecoration("Password").copyWith(
                     suffixIcon: IconButton(
                       icon: Icon(
-                        // Ganti ikon berdasarkan state
                         _isPasswordVisible
                             ? Icons.visibility_off
                             : Icons.visibility,
-                        color: text, // Beri warna ikon
+                        color: text,
                       ),
                       onPressed: () {
-                        // Panggil setState untuk toggle state
                         setState(() {
                           _isPasswordVisible = !_isPasswordVisible;
                         });
@@ -179,11 +181,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     return null;
                   },
                 ),
-                // --- Akhir Perubahan 2 ---
-
                 const SizedBox(height: 32),
 
-                // Tombol Login (Tidak berubah)
+                // Tombol Login
                 ElevatedButton(
                   onPressed: _isLoading ? null : _login,
                   child: _isLoading
@@ -199,7 +199,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 16),
 
-                // Tombol ke Halaman Registrasi (Tidak berubah)
+                // Tombol ke Halaman Registrasi
                 TextButton(
                   onPressed: _goToRegistration,
                   child: Text(

@@ -13,7 +13,9 @@
     <application
         android:label="flutter_pam"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:usesCleartextTraffic="true">
+        
 
         <receiver android:exported="true"
         android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">

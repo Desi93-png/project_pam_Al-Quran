@@ -25,10 +25,23 @@ class DatabaseHelper {
     String path = join(documentsDirectory.path, 'quran_app.db');
     return await openDatabase(
       path,
-      version: 1, // PENTING: Jika Anda menambah tabel, ini harus dinaikkan
+      // --- DIUBAH: Naikkan versi dari 1 ke 2 ---
+      version: 2,
       onCreate: _onCreate,
-      // onUpgrade: _onUpgrade, // Anda akan butuh ini jika menaikkan versi
+      // --- BARU: Tambahkan onUpgrade ---
+      onUpgrade: _onUpgrade,
     );
+  }
+
+  // --- BARU: Fungsi untuk upgrade DB ---
+  // Fungsi ini akan berjalan otomatis saat 'version' dinaikkan
+  Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      // Jika versi lama < 2, tambahkan kolom baru
+      print("Upgrading database to version 2: Adding profileImagePath");
+      await db.execute(
+          'ALTER TABLE users ADD COLUMN profileImagePath TEXT');
+    }
   }
 
   Future _onCreate(Database db, int version) async {
@@ -39,8 +52,13 @@ class DatabaseHelper {
         namaLengkap TEXT NOT NULL,
         nim TEXT UNIQUE NOT NULL,
         kelas TEXT NOT NULL,
-        username TEXT UNIQUE NOT NULL,
-        passwordHash TEXT NOT NULL
+        email TEXT UNIQUE NOT NULL,
+        passwordHash TEXT NOT NULL,
+        
+        -- BARU: Tambahkan kolom path foto --
+        profileImagePath TEXT 
+        
+        -- DIUBAH: Koma ekstra di akhir DIHAPUS (itu error SQL) --
       )
     ''');
 
@@ -57,14 +75,14 @@ class DatabaseHelper {
     ''');
   }
 
-  // --- Fungsi Hashing Password ---
+  // --- Fungsi Hashing Password (Tetap sama) ---
   String _hashPassword(String password) {
     final bytes = utf8.encode(password);
     final digest = sha256.convert(bytes);
     return digest.toString();
   }
 
-  // --- Operasi CRUD untuk User ---
+  // --- Operasi CRUD untuk User (Tetap sama) ---
   Future<int> registerUser(User user) async {
     Database db = await database;
     String hashedPassword = _hashPassword(user.password);
@@ -73,16 +91,17 @@ class DatabaseHelper {
       'namaLengkap': user.namaLengkap,
       'nim': user.nim,
       'kelas': user.kelas,
-      'username': user.username,
+      'email': user.email,
       'passwordHash': hashedPassword,
+      // profileImagePath akan null saat registrasi, jadi tidak perlu
     };
 
     try {
       return await db.insert('users', userMap);
     } catch (e) {
       print('Error saat registrasi: $e');
-      if (e.toString().contains('UNIQUE constraint failed: users.username')) {
-        throw Exception('Username sudah digunakan.');
+      if (e.toString().contains('UNIQUE constraint failed: users.email')) {
+        throw Exception('Email sudah digunakan.');
       } else if (e.toString().contains('UNIQUE constraint failed: users.nim')) {
         throw Exception('NIM sudah terdaftar.');
       } else {
@@ -91,19 +110,19 @@ class DatabaseHelper {
     }
   }
 
-  Future<User?> loginUser(String username, String password) async {
+  Future<User?> loginUser(String email, String password) async {
     Database db = await database;
     String hashedPassword = _hashPassword(password);
 
     List<Map<String, dynamic>> maps = await db.query(
       'users',
-      where: 'username = ? AND passwordHash = ?',
-      whereArgs: [username, hashedPassword],
+      where: 'email = ? AND passwordHash = ?',
+      whereArgs: [email, hashedPassword],
     );
 
     if (maps.isNotEmpty) {
       Map<String, dynamic> userMap = Map.from(maps.first);
-      userMap.remove('passwordHash');
+      // userMap.remove('passwordHash'); // Tidak perlu remove, fromDbMap mengatasinya
       return User.fromDbMap(userMap);
     } else {
       return null;
@@ -119,13 +138,28 @@ class DatabaseHelper {
     );
     if (maps.isNotEmpty) {
       Map<String, dynamic> userMap = Map.from(maps.first);
-      userMap.remove('passwordHash');
+      // userMap.remove('passwordHash'); // Tidak perlu remove, fromDbMap mengatasinya
       return User.fromDbMap(userMap);
     }
     return null;
   }
 
-  // --- FUNGSI CRUD UNTUK BOOKMARKS ---
+  // --- BARU: Fungsi untuk Update User ---
+  // Fungsi ini dipanggil oleh profile_screen.dart
+  Future<int> updateUser(User user) async {
+    final db = await database;
+    // Panggil user.toMapForUpdate() dari user_model.dart
+    // yang HANYA berisi data yang aman untuk di-update
+    return await db.update(
+      'users',
+      user.toMapForUpdate(),
+      where: 'id = ?',
+      whereArgs: [user.id],
+    );
+  }
+  // ------------------------------------
+
+  // --- FUNGSI CRUD UNTUK BOOKMARKS (Tetap sama) ---
 
   Future<int> addBookmark(Bookmark bookmark) async {
     Database db = await database;
@@ -166,8 +200,6 @@ class DatabaseHelper {
     );
     return maps.map((map) => map['ayat_nomor'] as int).toSet();
   }
-
-  // --- FUNGSI BARU UNTUK HALAMAN BOOKMARK SCREEN ---
 
   Future<List<Bookmark>> getAllUserBookmarks(int userId) async {
     Database db = await database;

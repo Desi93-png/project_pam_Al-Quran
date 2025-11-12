@@ -322,10 +322,18 @@ class _KalkulatorZakatPageState extends State<KalkulatorZakatPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            title,
-            style: GoogleFonts.poppins(color: text, fontSize: 16),
+          // --- INI PERBAIKANNYA ---
+          Flexible(
+            // 1. Bungkus Text dengan Flexible
+            child: Text(
+              title,
+              style: GoogleFonts.poppins(color: text, fontSize: 16),
+            ),
           ),
+          // --- BATAS PERBAIKAN ---
+
+          const SizedBox(width: 16), // 2. Beri jarak aman
+
           Text(
             value,
             style: GoogleFonts.poppins(
