@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:math'; // <-- 1. TAMBAHKAN IMPORT 'dart:math'
+import 'dart:math';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -10,7 +10,6 @@ import 'package:flutter_pam/models/surah.dart';
 import 'package:flutter_pam/helpers/database_helper.dart';
 import 'package:flutter_pam/models/bookmark_model.dart';
 
-// --- 2. TAMBAHKAN IMPORT NOTIFICATION SERVICE ---
 import 'package:flutter_pam/services/notification_service.dart';
 
 class DetailScreen extends StatefulWidget {
@@ -27,7 +26,6 @@ class _DetailScreenState extends State<DetailScreen> {
   late Future<Surah> _surahFuture;
   final DatabaseHelper _dbHelper = DatabaseHelper();
 
-  // --- 3. BUAT INSTANCE NOTIFICATION SERVICE ---
   final NotificationService _notificationService = NotificationService();
 
   final Set<int> _bookmarkedAyatNomors = {};
@@ -46,7 +44,6 @@ class _DetailScreenState extends State<DetailScreen> {
   }
 
   Future<void> _loadBookmarks() async {
-    // ... (Fungsi ini tidak berubah)
     try {
       final bookmarks = await _dbHelper.getBookmarkedAyatNomors(
           widget.userId, widget.noSurat);
@@ -71,9 +68,7 @@ class _DetailScreenState extends State<DetailScreen> {
     return FutureBuilder<Surah>(
         future: _surahFuture,
         builder: ((context, snapshot) {
-          if (snapshot.hasError) {
-            // ... (Kode error tidak berubah)
-          }
+          if (snapshot.hasError) {}
 
           if (snapshot.hasData && _bookmarksLoaded) {
             Surah surah = snapshot.data!;
@@ -93,10 +88,9 @@ class _DetailScreenState extends State<DetailScreen> {
                       final ayat = surah.ayat!
                           .elementAt(index + (widget.noSurat == 1 ? 1 : 0));
 
-                      // --- 4. KIRIM SELURUH OBJEK 'surah' ---
                       return _ayatItem(
                         ayat: ayat,
-                        surah: surah, // Kirim seluruh objek Surah
+                        surah: surah,
                       );
                     },
                     itemCount:
@@ -108,7 +102,6 @@ class _DetailScreenState extends State<DetailScreen> {
             );
           }
 
-          // Tampilkan loading
           return Scaffold(
             backgroundColor: background,
             body: const Center(child: CircularProgressIndicator()),
@@ -116,7 +109,6 @@ class _DetailScreenState extends State<DetailScreen> {
         }));
   }
 
-  // --- 5. UBAH PARAMETER DARI 'surahNomor' MENJADI 'surah' ---
   Widget _ayatItem({required Ayat ayat, required Surah surah}) {
     final bool isBookmarked = _bookmarkedAyatNomors.contains(ayat.nomor);
 
@@ -131,7 +123,6 @@ class _DetailScreenState extends State<DetailScreen> {
                 color: gray, borderRadius: BorderRadius.circular(10)),
             child: Row(
               children: [
-                // ... (Container nomor ayat tidak berubah)
                 Container(
                   width: 27,
                   height: 27,
@@ -156,40 +147,32 @@ class _DetailScreenState extends State<DetailScreen> {
                     color: Colors.white,
                   ),
                   onPressed: () {
-                    // --- 6. MODIFIKASI ONPRESSED ---
                     setState(() {
                       if (isBookmarked) {
-                        // --- Hapus Bookmark ---
                         _bookmarkedAyatNomors.remove(ayat.nomor);
                         _dbHelper.removeBookmark(
-                            widget.userId,
-                            surah.nomor, // Gunakan surah.nomor
-                            ayat.nomor);
-                        // (Opsional: Tampilkan notifikasi "Bookmark dihapus")
+                            widget.userId, surah.nomor, ayat.nomor);
+
                         _notificationService.showSimpleNotification(
                             id: Random().nextInt(1000),
                             title: "Bookmark Dihapus",
                             body:
                                 "Ayat ${ayat.nomor} dari Q.S. ${surah.namaLatin} telah dihapus.");
                       } else {
-                        // --- Tambah Bookmark ---
                         _bookmarkedAyatNomors.add(ayat.nomor);
                         final newBookmark = Bookmark(
                             userId: widget.userId,
-                            surahNomor: surah.nomor, // Gunakan surah.nomor
+                            surahNomor: surah.nomor,
                             ayatNomor: ayat.nomor);
                         _dbHelper.addBookmark(newBookmark);
 
-                        // --- KIRIM NOTIFIKASI ---
                         _notificationService.showSimpleNotification(
-                            // ID acak agar notifikasi tidak saling menimpa
                             id: Random().nextInt(1000),
                             title: "Bookmark Ditambahkan",
                             body:
                                 "Ayat ${ayat.nomor} dari Q.S. ${surah.namaLatin} telah disimpan.");
                       }
                     });
-                    // --- AKHIR MODIFIKASI ONPRESSED ---
                   },
                 ),
               ],
@@ -311,18 +294,11 @@ class _DetailScreenState extends State<DetailScreen> {
         ]),
       );
 
-  // Widget _appBar (Tidak Berubah)
-
   AppBar _appBar({required BuildContext context, required Surah surah}) =>
       AppBar(
-        //... (kode _appBar tidak berubah)
-
         backgroundColor: background,
-
         automaticallyImplyLeading: false,
-
         elevation: 0,
-
         title: Row(children: [
           IconButton(
               onPressed: (() => Navigator.of(context).pop()),

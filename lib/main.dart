@@ -1,30 +1,20 @@
-// Salin dan timpa seluruh file lib/main.dart
-
 import 'package:flutter/material.dart';
-import 'package:flutter_pam/screens/splash_screen.dart'; // Ganti dengan splash screen Anda
-import 'package:flutter_pam/services/notification_service.dart'; // <-- Import service
-import 'package:timezone/data/latest_all.dart' as tz; // <-- Import timezone
+import 'package:flutter_pam/screens/splash_screen.dart';
+import 'package:flutter_pam/services/notification_service.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
 
 Future<void> main() async {
-  // Pastikan Flutter binding sudah siap
   WidgetsFlutterBinding.ensureInitialized();
 
-  // --- Inisialisasi (TANPA PENJADWALAN OTOMATIS) ---
   try {
-    tz.initializeTimeZones(); // Inisialisasi database timezone (DIBUTUHKAN)
+    tz.initializeTimeZones();
     print("Timezones Initialized.");
 
-    await NotificationService().initNotification(); // Inisialisasi plugin (WAJIB)
+    await NotificationService().initNotification();
     print("Notification Service Initialized.");
-
-    // --- BARIS INI TELAH DIHAPUS ---
-    // await NotificationService().scheduleDailyReminderNotification();
-    // --- AKHIR PERUBAHAN ---
-
   } catch (e) {
-    debugPrint("Error saat setup notifikasi: $e"); // Cetak error jika gagal
+    debugPrint("Error saat setup notifikasi: $e");
   }
-  // --------------------------------------------------
 
   runApp(const MyApp());
 }

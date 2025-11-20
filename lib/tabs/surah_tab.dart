@@ -7,12 +7,8 @@ import 'package:flutter_pam/models/surah.dart';
 import 'package:flutter_pam/screens/detail_screen.dart';
 
 class SurahTab extends StatelessWidget {
-  // --- MODIFIKASI 1: Tambahkan final int? userId ---
-  // Kita buat nullable 'int?' karena 'HomeTabContent' mungkin
-  // mengirim null saat pertama kali loading.
   final int? userId;
 
-  // --- MODIFIKASI 2: Terima userId di constructor ---
   const SurahTab({super.key, required this.userId});
 
   Future<List<Surah>> _getSurahList() async {
@@ -33,7 +29,6 @@ class SurahTab extends StatelessWidget {
               itemBuilder: (context, index) => _surahItem(
                   context: context,
                   surah: snapshot.data!.elementAt(index),
-                  // --- MODIFIKASI 3: Kirim userId ke _surahItem ---
                   userId: userId),
               separatorBuilder: (context, index) =>
                   Divider(color: const Color(0xFF7B80AD).withOpacity(.35)),
@@ -41,25 +36,21 @@ class SurahTab extends StatelessWidget {
         }));
   }
 
-  // --- MODIFIKASI 4: Terima userId di _surahItem ---
   Widget _surahItem({
     required Surah surah,
     required BuildContext context,
-    required int? userId, // Tambahkan ini
+    required int? userId,
   }) =>
       GestureDetector(
         behavior: HitTestBehavior.opaque,
-        // --- MODIFIKASI 5: Perbarui logika onTap ---
         onTap: () {
-          // Cek dulu apakah userId sudah ada (tidak null)
           if (userId != null) {
             Navigator.of(context).push(MaterialPageRoute(
                 builder: (context) => DetailScreen(
                       noSurat: surah.nomor,
-                      userId: userId, // Kirim userId ke DetailScreen
+                      userId: userId,
                     )));
           } else {
-            // Jika userId null (masih loading), tampilkan pesan
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text('Gagal memuat data user, coba lagi.'),

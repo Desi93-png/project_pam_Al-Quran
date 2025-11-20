@@ -25,22 +25,16 @@ class DatabaseHelper {
     String path = join(documentsDirectory.path, 'quran_app.db');
     return await openDatabase(
       path,
-      // --- DIUBAH: Naikkan versi dari 1 ke 2 ---
       version: 2,
       onCreate: _onCreate,
-      // --- BARU: Tambahkan onUpgrade ---
       onUpgrade: _onUpgrade,
     );
   }
 
-  // --- BARU: Fungsi untuk upgrade DB ---
-  // Fungsi ini akan berjalan otomatis saat 'version' dinaikkan
   Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
-      // Jika versi lama < 2, tambahkan kolom baru
       print("Upgrading database to version 2: Adding profileImagePath");
-      await db.execute(
-          'ALTER TABLE users ADD COLUMN profileImagePath TEXT');
+      await db.execute('ALTER TABLE users ADD COLUMN profileImagePath TEXT');
     }
   }
 
@@ -75,14 +69,12 @@ class DatabaseHelper {
     ''');
   }
 
-  // --- Fungsi Hashing Password (Tetap sama) ---
   String _hashPassword(String password) {
     final bytes = utf8.encode(password);
     final digest = sha256.convert(bytes);
     return digest.toString();
   }
 
-  // --- Operasi CRUD untuk User (Tetap sama) ---
   Future<int> registerUser(User user) async {
     Database db = await database;
     String hashedPassword = _hashPassword(user.password);
@@ -93,7 +85,6 @@ class DatabaseHelper {
       'kelas': user.kelas,
       'email': user.email,
       'passwordHash': hashedPassword,
-      // profileImagePath akan null saat registrasi, jadi tidak perlu
     };
 
     try {
@@ -122,7 +113,7 @@ class DatabaseHelper {
 
     if (maps.isNotEmpty) {
       Map<String, dynamic> userMap = Map.from(maps.first);
-      // userMap.remove('passwordHash'); // Tidak perlu remove, fromDbMap mengatasinya
+
       return User.fromDbMap(userMap);
     } else {
       return null;
@@ -138,18 +129,15 @@ class DatabaseHelper {
     );
     if (maps.isNotEmpty) {
       Map<String, dynamic> userMap = Map.from(maps.first);
-      // userMap.remove('passwordHash'); // Tidak perlu remove, fromDbMap mengatasinya
+
       return User.fromDbMap(userMap);
     }
     return null;
   }
 
-  // --- BARU: Fungsi untuk Update User ---
-  // Fungsi ini dipanggil oleh profile_screen.dart
   Future<int> updateUser(User user) async {
     final db = await database;
-    // Panggil user.toMapForUpdate() dari user_model.dart
-    // yang HANYA berisi data yang aman untuk di-update
+
     return await db.update(
       'users',
       user.toMapForUpdate(),
@@ -157,9 +145,6 @@ class DatabaseHelper {
       whereArgs: [user.id],
     );
   }
-  // ------------------------------------
-
-  // --- FUNGSI CRUD UNTUK BOOKMARKS (Tetap sama) ---
 
   Future<int> addBookmark(Bookmark bookmark) async {
     Database db = await database;

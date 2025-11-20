@@ -1,21 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'dart:async'; // Untuk debounce (penundaan) pencarian
+import 'dart:async';
 import 'package:intl/intl.dart';
-import 'package:flutter_pam/globals.dart'; // Import globals untuk warna
+import 'package:flutter_pam/globals.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-// --- Import untuk LBS ---
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
-// -----------------------
 
-// Model PrayerTimes (Tidak perlu tanggal dari API lagi)
 class PrayerTimes {
   final String imsak;
   final String fajr;
-  final String sunrise; // Syuruq
+  final String sunrise;
   final String dhuhr;
   final String asr;
   final String maghrib;
@@ -35,7 +31,7 @@ class PrayerTimes {
   factory PrayerTimes.fromJson(Map<String, dynamic> json) {
     final timings = json['data']['timings'];
     final timezone = json['data']['meta']['timezone'];
-    String formatTime(String time) => time.split(' ')[0]; // Ambil HH:mm
+    String formatTime(String time) => time.split(' ')[0];
 
     return PrayerTimes(
       imsak: formatTime(timings['Imsak']),
@@ -62,7 +58,6 @@ class _TimeConverterScreenState extends State<TimeConverterScreen> {
   static const String _searchedLocationKey = '🔍 Lokasi Pencarian';
   Timer? _debounce;
 
-  // State untuk Tanggal & Pencarian Terakhir
   DateTime _selectedDate = DateTime.now();
   double? _lastSearchedLat;
   double? _lastSearchedLon;
@@ -112,7 +107,7 @@ class _TimeConverterScreenState extends State<TimeConverterScreen> {
         }
       } catch (geoError) {
         print("Gagal geocoding: $geoError. Menggunakan nama default.");
-        cityName = "Lokasi Saat Ini"; // Fallback
+        cityName = "Lokasi Saat Ini";
       }
 
       times = await _fetchPrayerTimesByCoords(
@@ -258,8 +253,8 @@ class _TimeConverterScreenState extends State<TimeConverterScreen> {
     final DateTime? newDate = await showDatePicker(
       context: context,
       initialDate: _selectedDate,
-      firstDate: DateTime(2000), // Tahun awal
-      lastDate: DateTime(2100), // Tahun akhir
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
       builder: (context, child) {
         return Theme(
           data: ThemeData.dark().copyWith(
@@ -313,8 +308,6 @@ class _TimeConverterScreenState extends State<TimeConverterScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // --- PERUBAHAN 1: Hapus `Row` dan tombol kalender dari sini ---
-            // Autocomplete sekarang menjadi child langsung dari Column
             Autocomplete<Map<String, dynamic>>(
               displayStringForOption: (option) => option['display_name'],
               optionsBuilder: _fetchCitySuggestions,
@@ -418,10 +411,7 @@ class _TimeConverterScreenState extends State<TimeConverterScreen> {
                 );
               },
             ),
-            // --- BATAS PERUBAHAN 1 ---
-
             const SizedBox(height: 20),
-
             Expanded(
               child: FutureBuilder<PrayerTimes>(
                 future: _prayerTimesFuture,
@@ -505,12 +495,10 @@ class _TimeConverterScreenState extends State<TimeConverterScreen> {
     }
   }
 
-  // --- PERUBAHAN 2: Modifikasi Card untuk memasukkan tombol kalender ---
   Widget _buildPrayerTimeCard(
       String locationName, PrayerTimes times, DateTime displayDate) {
-    // Format tanggalnya di sini, menggunakan `displayDate` yang benar
     final String formattedDate = DateFormat('dd MMM yyyy').format(displayDate);
-    // Ambil warna dari globals (perlu didefinisikan di luar build)
+
     final Color defaultColor = text;
     final Color primaryColor = primary;
 
@@ -531,31 +519,23 @@ class _TimeConverterScreenState extends State<TimeConverterScreen> {
                   fontWeight: FontWeight.bold,
                   color: Colors.white),
             ),
-
-            // --- INI DIA PERUBAHANNYA ---
-            // Ganti 'Text(formattedDate)' dengan Row
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Tanggal (seperti sebelumnya)
                 Text(
-                  formattedDate, // Tampilkan tanggal yang sudah kita format
+                  formattedDate,
                   style: GoogleFonts.poppins(fontSize: 12, color: defaultColor),
                 ),
-
-                // Tombol Kalender
                 IconButton(
                   icon: Icon(Icons.calendar_today, color: primaryColor),
-                  iconSize: 20.0, // Ukuran ikon lebih kecil
-                  onPressed: _showDatePicker, // Panggil fungsi yang sama
-                  padding: EdgeInsets.zero, // Hapus padding
-                  constraints: BoxConstraints(), // Hapus batasan ukuran
+                  iconSize: 20.0,
+                  onPressed: _showDatePicker,
+                  padding: EdgeInsets.zero,
+                  constraints: BoxConstraints(),
                 ),
               ],
             ),
-            // --- BATAS PERUBAHAN 2 ---
-
             const Divider(height: 24, color: Colors.white30),
             _buildTimeRow('Imsak', times.imsak),
             _buildTimeRow('Subuh', times.fajr),
@@ -571,7 +551,6 @@ class _TimeConverterScreenState extends State<TimeConverterScreen> {
   }
 
   Widget _buildTimeRow(String name, String time) {
-    // Ambil warna dari globals
     final Color primaryColor = primary;
 
     return Padding(

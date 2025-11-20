@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_pam/helpers/database_helper.dart';
 import 'package:flutter_pam/models/user_model.dart';
-import 'package:flutter_pam/screens/home_screen.dart'; // Untuk navigasi setelah login
-import 'package:flutter_pam/screens/registration_screen.dart'; // Untuk tombol Daftar
+import 'package:flutter_pam/screens/home_screen.dart';
+import 'package:flutter_pam/screens/registration_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_pam/globals.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -16,9 +16,9 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  // --- DIUBAH: Ganti nama variabel ---
-  final _emailController = TextEditingController(); // <-- DIGANTI
-  // ------------------------------------
+
+  final _emailController = TextEditingController();
+
   final _passwordController = TextEditingController();
 
   bool _isLoading = false;
@@ -30,7 +30,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void dispose() {
-    _emailController.dispose(); // <-- DIGANTI
+    _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -44,12 +44,11 @@ class _LoginScreenState extends State<LoginScreen> {
     if (_formKey.currentState!.validate()) {
       try {
         User? user = await dbHelper.loginUser(
-          _emailController.text, // <-- DIGANTI
+          _emailController.text,
           _passwordController.text,
         );
 
         if (user != null && user.id != null) {
-          // Login Berhasil!
           final prefs = await SharedPreferences.getInstance();
           await prefs.setInt('userId', user.id!);
 
@@ -59,7 +58,6 @@ class _LoginScreenState extends State<LoginScreen> {
             (Route<dynamic> route) => false,
           );
         } else {
-          // Login Gagal
           setState(() {
             _errorMessage = 'Email atau password salah.';
           });
@@ -121,7 +119,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 40),
-
                 if (_errorMessage != null)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 16.0),
@@ -131,14 +128,14 @@ class _LoginScreenState extends State<LoginScreen> {
                       textAlign: TextAlign.center,
                     ),
                   ),
-
-                // --- PERBAIKAN UNTUK FIELD EMAIL ---
                 TextFormField(
-                  controller: _emailController, // <-- DIGANTI
+                  controller: _emailController,
                   style: TextStyle(color: Colors.white),
-                  keyboardType: TextInputType.emailAddress, // <-- 1. TAMBAHKAN KEYBOARD
-                  decoration: _inputDecoration("Email"),
-                  validator: (value) { // <-- 2. TAMBAHKAN VALIDASI EMAIL
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: _inputDecoration("Email").copyWith(
+                    fillColor: Color(0xFF121931),
+                  ),
+                  validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Email tidak boleh kosong';
                     }
@@ -150,16 +147,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     return null;
                   },
                 ),
-                // --- AKHIR PERBAIKAN ---
-
                 const SizedBox(height: 16),
-
-                // --- Password Field (Sudah benar) ---
                 TextFormField(
                   controller: _passwordController,
                   obscureText: !_isPasswordVisible,
                   style: TextStyle(color: Colors.white),
                   decoration: _inputDecoration("Password").copyWith(
+                    fillColor: Color(0xFF121931),
                     suffixIcon: IconButton(
                       icon: Icon(
                         _isPasswordVisible
@@ -182,15 +176,13 @@ class _LoginScreenState extends State<LoginScreen> {
                   },
                 ),
                 const SizedBox(height: 32),
-
-                // Tombol Login
                 ElevatedButton(
                   onPressed: _isLoading ? null : _login,
                   child: _isLoading
                       ? CircularProgressIndicator(color: Colors.white)
                       : Text("Login"),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: primary,
+                    backgroundColor: Color(0xFFA44AFF),
                     foregroundColor: Colors.white,
                     padding: EdgeInsets.symmetric(vertical: 16),
                     textStyle: GoogleFonts.poppins(
@@ -198,8 +190,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-
-                // Tombol ke Halaman Registrasi
                 TextButton(
                   onPressed: _goToRegistration,
                   child: Text(
@@ -215,13 +205,11 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  // Helper untuk InputDecoration (Tidak berubah)
   InputDecoration _inputDecoration(String label) {
     return InputDecoration(
       labelText: label,
       labelStyle: TextStyle(color: text),
       filled: true,
-      fillColor: gray,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
         borderSide: BorderSide.none,

@@ -1,5 +1,3 @@
-// lib/models/bookmark_model.dart
-
 class Bookmark {
   final int? id;
   final int userId;

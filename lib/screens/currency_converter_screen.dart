@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:intl/intl.dart';
-
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_pam/globals.dart';
 
@@ -37,7 +36,6 @@ class KalkulatorZakatPage extends StatefulWidget {
 }
 
 class _KalkulatorZakatPageState extends State<KalkulatorZakatPage> {
-  // --- VARIABEL STATE ---
   final String _metalApiKey = "6f7f87826ae9ba492adcc6c885f1f831";
   final String _exchangeRateApiKey = "01573e01cd3549ecbc6f6651";
 
@@ -48,7 +46,6 @@ class _KalkulatorZakatPageState extends State<KalkulatorZakatPage> {
   double _zakatInUSD = 0.0;
   double _zakatInSAR = 0.0;
 
-  // --- PERUBAHAN 1: Mengosongkan status message awal ---
   String _statusMessage = "";
 
   final formatIDR =
@@ -58,7 +55,6 @@ class _KalkulatorZakatPageState extends State<KalkulatorZakatPage> {
   final formatSAR =
       NumberFormat.currency(locale: 'en_SA', symbol: 'SAR ', decimalDigits: 2);
 
-  // --- FUNGSI API (Tidak Berubah) ---
   Future<double> _fetchGoldPricePerOunce() async {
     String url =
         "https://api.metalpriceapi.com/v1/latest?api_key=$_metalApiKey&base=USD&currencies=XAU";
@@ -86,18 +82,15 @@ class _KalkulatorZakatPageState extends State<KalkulatorZakatPage> {
     }
   }
 
-  // --- FUNGSI KALKULASI ---
   void _calculateZakat() async {
-    // --- PERUBAHAN 2: Menambahkan validasi input kosong ---
     if (_wealthController.text.isEmpty) {
       setState(() {
         _statusMessage = "Mohon masukkan total kekayaan Anda.";
-        _nisabInIDR = 0; // Sembunyikan card hasil jika input kosong
+        _nisabInIDR = 0;
         _zakatInIDR = 0;
       });
-      return; // Hentikan eksekusi fungsi
+      return;
     }
-    // --- Akhir Perubahan 2 ---
 
     setState(() {
       _isLoading = true;
@@ -185,10 +178,6 @@ class _KalkulatorZakatPageState extends State<KalkulatorZakatPage> {
               ),
             ),
             const SizedBox(height: 8),
-
-            // --- PERUBAHAN 3: Memindahkan _statusMessage ---
-            // Text(_statusMessage) dihapus dari sini
-
             const SizedBox(height: 24),
             TextField(
               controller: _wealthController,
@@ -220,7 +209,6 @@ class _KalkulatorZakatPageState extends State<KalkulatorZakatPage> {
               ),
             ),
             const SizedBox(height: 24),
-
             ElevatedButton(
               onPressed: _isLoading ? null : _calculateZakat,
               style: ElevatedButton.styleFrom(
@@ -244,24 +232,18 @@ class _KalkulatorZakatPageState extends State<KalkulatorZakatPage> {
                   : const Text("Hitung Zakat"),
             ),
             const SizedBox(height: 24),
-
-            // --- PERUBAHAN 3: _statusMessage dipindahkan ke sini ---
-            // Hanya tampilkan widget Text jika _statusMessage tidak kosong
             if (_statusMessage.isNotEmpty)
               Padding(
-                padding: const EdgeInsets.only(bottom: 24.0), // Ganti SizedBox
+                padding: const EdgeInsets.only(bottom: 24.0),
                 child: Text(
                   _statusMessage,
-                  textAlign: TextAlign.center, // Agar teks rata tengah
+                  textAlign: TextAlign.center,
                   style: GoogleFonts.poppins(
-                    color: text, // Warna teks abu-abu
+                    color: text,
                     fontSize: 14,
                   ),
                 ),
               ),
-            // --- Akhir Perubahan 3 ---
-
-            // Card Hasil (Hanya tampil jika Nisab sudah dihitung)
             if (_nisabInIDR > 0)
               Container(
                 decoration: BoxDecoration(
@@ -287,8 +269,6 @@ class _KalkulatorZakatPageState extends State<KalkulatorZakatPage> {
                       ),
                       _buildResultRow(
                           "Nisab (85gr Emas):", formatIDR.format(_nisabInIDR)),
-
-                      // Tampilkan detail zakat hanya jika wajib (zakatInIDR > 0)
                       if (_zakatInIDR > 0) ...[
                         const SizedBox(height: 16),
                         Text(
@@ -322,18 +302,13 @@ class _KalkulatorZakatPageState extends State<KalkulatorZakatPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // --- INI PERBAIKANNYA ---
           Flexible(
-            // 1. Bungkus Text dengan Flexible
             child: Text(
               title,
               style: GoogleFonts.poppins(color: text, fontSize: 16),
             ),
           ),
-          // --- BATAS PERBAIKAN ---
-
-          const SizedBox(width: 16), // 2. Beri jarak aman
-
+          const SizedBox(width: 16),
           Text(
             value,
             style: GoogleFonts.poppins(

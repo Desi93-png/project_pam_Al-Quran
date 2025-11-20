@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_pam/screens/home_screen.dart';
-import 'package:flutter_pam/screens/login_screen.dart'; // Import LoginScreen
+import 'package:flutter_pam/screens/login_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_pam/globals.dart';
 
@@ -22,9 +22,9 @@ class _SplashScreenState extends State<SplashScreen> {
     await Future.delayed(Duration(seconds: 2));
 
     final prefs = await SharedPreferences.getInstance();
-    final int? userId = prefs.getInt('userId'); // Cek apakah userId ada
+    final int? userId = prefs.getInt('userId');
 
-    if (!mounted) return; // Pastikan widget masih ada
+    if (!mounted) return;
 
     if (userId != null) {
       Navigator.pushReplacement(

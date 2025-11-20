@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_pam/helpers/database_helper.dart';
 import 'package:flutter_pam/models/user_model.dart';
-import 'package:flutter_pam/globals.dart'; // Untuk warna
+import 'package:flutter_pam/globals.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class RegistrationScreen extends StatefulWidget {
@@ -16,9 +16,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final _namaController = TextEditingController();
   final _nimController = TextEditingController();
   final _kelasController = TextEditingController();
-  // --- DIUBAH: Ganti nama variabel ---
-  final _emailController = TextEditingController(); // <-- DIGANTI
-  // ------------------------------------
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
@@ -35,7 +33,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     _namaController.dispose();
     _nimController.dispose();
     _kelasController.dispose();
-    _emailController.dispose(); // <-- DIGANTI
+    _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
@@ -60,7 +58,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         namaLengkap: _namaController.text,
         nim: _nimController.text,
         kelas: _kelasController.text,
-        email: _emailController.text, // <-- DIGANTI
+        email: _emailController.text,
         password: _passwordController.text,
       );
 
@@ -70,7 +68,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Registrasi berhasil! Silakan login.')),
           );
-          Navigator.pop(context); // Kembali ke halaman login
+          Navigator.pop(context);
         } else {
           setState(() {
             _errorMessage = 'Registrasi gagal, coba lagi.';
@@ -136,27 +134,17 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               const SizedBox(height: 16),
               _buildTextField(_kelasController, "Kelas"),
               const SizedBox(height: 16),
-              
-              // --- DIUBAH: Panggil helper baru untuk Email ---
-              _buildEmailField(_emailController, "Email"), // <-- DIGANTI
-              // ---------------------------------------------
-
+              _buildEmailField(_emailController, "Email"),
               const SizedBox(height: 16),
-              _buildPasswordField(_passwordController, "Password",
-                  _isPasswordVisible, // Kirim state
-                  () {
-                // Kirim fungsi untuk toggle
+              _buildPasswordField(
+                  _passwordController, "Password", _isPasswordVisible, () {
                 setState(() {
                   _isPasswordVisible = !_isPasswordVisible;
                 });
               }),
               const SizedBox(height: 16),
-              _buildPasswordField(
-                  _confirmPasswordController,
-                  "Konfirmasi Password",
-                  _isConfirmPasswordVisible, // Kirim state
-                  () {
-                // Kirim fungsi untuk toggle
+              _buildPasswordField(_confirmPasswordController,
+                  "Konfirmasi Password", _isConfirmPasswordVisible, () {
                 setState(() {
                   _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
                 });
@@ -182,7 +170,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     );
   }
 
-  // Widget helper untuk TextField biasa
   Widget _buildTextField(TextEditingController controller, String label) {
     return TextFormField(
       controller: controller,
@@ -214,12 +201,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     );
   }
 
-  // --- BARU: Widget helper KHUSUS untuk Email ---
   Widget _buildEmailField(TextEditingController controller, String label) {
     return TextFormField(
       controller: controller,
       style: TextStyle(color: Colors.white),
-      keyboardType: TextInputType.emailAddress, // <-- 1. Tambahkan Keyboard
+      keyboardType: TextInputType.emailAddress,
       decoration: InputDecoration(
         labelText: label,
         labelStyle: TextStyle(color: text),
@@ -238,11 +224,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           borderSide: BorderSide(color: primary),
         ),
       ),
-      validator: (value) { // <-- 2. Validator lebih ketat
+      validator: (value) {
         if (value == null || value.isEmpty) {
           return '$label tidak boleh kosong';
         }
-        // Validasi format email sederhana
+
         final emailRegex = RegExp(r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
         if (!emailRegex.hasMatch(value)) {
           return 'Masukkan format email yang valid';
@@ -251,19 +237,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       },
     );
   }
-  // -------------------------------------------
 
-  // Widget helper untuk Password
-  Widget _buildPasswordField(
-      TextEditingController controller,
-      String label,
-      bool isVisible, // Tambahkan parameter ini
-      VoidCallback onToggleVisibility // Tambahkan parameter ini
-      ) {
-    // ... (Fungsi ini sudah benar, tidak perlu diubah)
+  Widget _buildPasswordField(TextEditingController controller, String label,
+      bool isVisible, VoidCallback onToggleVisibility) {
     return TextFormField(
       controller: controller,
-      obscureText: !isVisible, // Gunakan state
+      obscureText: !isVisible,
       style: TextStyle(color: Colors.white),
       decoration: InputDecoration(
         labelText: label,

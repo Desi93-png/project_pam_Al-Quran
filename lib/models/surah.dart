@@ -1,6 +1,3 @@
-// To parse this JSON data, do
-//     final surah = surahFromJson(jsonString);
-
 import 'dart:convert';
 import 'package:flutter_pam/models/ayat.dart';
 
@@ -61,10 +58,8 @@ class Surah {
       };
 }
 
-// Gunakan lowerCamelCase untuk enum (supaya tidak kena warning)
 enum TempatTurun { mekah, madinah }
 
-// Mapping string dari API ke enum
 final tempatTurunValues = EnumValues({
   "madinah": TempatTurun.madinah,
   "mekah": TempatTurun.mekah,
@@ -72,12 +67,11 @@ final tempatTurunValues = EnumValues({
 
 class EnumValues<T> {
   Map<String, T> map;
-  Map<T, String>? reverseMap; // ubah ke nullable
+  Map<T, String>? reverseMap;
 
   EnumValues(this.map);
 
   Map<T, String> get reverse {
-    // gunakan null-aware assignment agar lebih efisien
     reverseMap ??= map.map((k, v) => MapEntry(v, k));
     return reverseMap!;
   }

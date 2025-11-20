@@ -1,20 +1,15 @@
-// lib/delegates/surah_search_delegate.dart
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_pam/models/surah.dart';
 import 'package:flutter_pam/globals.dart';
 import 'package:google_fonts/google_fonts.dart';
-// Import DetailScreen
 import 'package:flutter_pam/screens/detail_screen.dart';
 
 class SurahSearchDelegate extends SearchDelegate<Surah?> {
-  // --- 1. TAMBAHKAN VARIABLE UNTUK MENYIMPAN USER ID ---
   final int userId;
 
   late Future<List<Surah>> _surahListFuture;
 
-  // --- 2. MODIFIKASI KONSTRUKTOR UNTUK MENERIMA USER ID ---
   SurahSearchDelegate({required this.userId}) {
     _surahListFuture = _loadSurahsFromAsset();
   }
@@ -117,16 +112,13 @@ class SurahSearchDelegate extends SearchDelegate<Surah?> {
                   style: TextStyle(color: text)),
               trailing: Text(surah.nama,
                   style: GoogleFonts.amiri(color: primary, fontSize: 20)),
-
-              // --- 3. PERBAIKI NAVIGASI DI SINI ---
               onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    // Kirimkan 'noSurat' DAN 'userId'
                     builder: (context) => DetailScreen(
                       noSurat: surah.nomor,
-                      userId: this.userId, // <-- TAMBAHKAN INI
+                      userId: this.userId,
                     ),
                   ),
                 );

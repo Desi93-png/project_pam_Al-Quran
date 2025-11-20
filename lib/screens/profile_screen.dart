@@ -1,20 +1,15 @@
-// Salin dan timpa seluruh file lib/screens/profile_screen.dart
-
 import 'package:flutter/material.dart';
-import 'package:flutter_pam/globals.dart'; // Warna
+import 'package:flutter_pam/globals.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:shared_preferences/shared_preferences.dart'; // Untuk session
-import 'package:flutter_pam/screens/login_screen.dart'; // Untuk navigasi
-import 'package:flutter_pam/helpers/database_helper.dart'; // Import DatabaseHelper
-import 'package:flutter_pam/models/user_model.dart'; // Import UserModel
-import 'package:flutter_pam/services/notification_service.dart'; // Sesuaikan path
-
-// --- Import untuk Image Picker ---
-import 'dart:io'; // Untuk File
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_pam/screens/login_screen.dart';
+import 'package:flutter_pam/helpers/database_helper.dart';
+import 'package:flutter_pam/models/user_model.dart';
+import 'package:flutter_pam/services/notification_service.dart';
+import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
-// --------------------------------------
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -24,26 +19,21 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  // State untuk data
   User? _currentUser;
   bool _isLoading = true;
   String _errorMessage = '';
   final dbHelper = DatabaseHelper();
   final NotificationService _notificationService = NotificationService();
 
-  // State untuk Mode Edit
   bool _isEditing = false;
   final _formKey = GlobalKey<FormState>();
 
-  // Controller
   late TextEditingController _namaController;
   late TextEditingController _nimController;
   late TextEditingController _kelasController;
-  // --- BARU: Tambahkan controller untuk Email ---
-  late TextEditingController _emailController;
-  // ---------------------------------------------
 
-  // State untuk gambar baru
+  late TextEditingController _emailController;
+
   XFile? _newImageFile;
 
   @override
@@ -69,9 +59,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             _namaController = TextEditingController(text: user.namaLengkap);
             _nimController = TextEditingController(text: user.nim);
             _kelasController = TextEditingController(text: user.kelas);
-            // --- BARU: Inisialisasi controller Email ---
+
             _emailController = TextEditingController(text: user.email);
-            // -----------------------------------------
+
             _isLoading = false;
           });
         } else {
@@ -98,14 +88,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _namaController.dispose();
     _nimController.dispose();
     _kelasController.dispose();
-    // --- BARU: Dispose controller Email ---
+
     _emailController.dispose();
-    // ------------------------------------
+
     super.dispose();
   }
 
   Future<void> _logout() async {
-    // ...(Kode _logout Anda tetap sama)...
     final bool? confirmLogout = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
@@ -142,7 +131,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   AppBar _appBar() => AppBar(
-        // ...(Kode _appBar Anda tetap sama)...
         backgroundColor: background,
         automaticallyImplyLeading: false,
         elevation: 0,
@@ -162,7 +150,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // ...(Kode build Anda tetap sama)...
     return Scaffold(
       backgroundColor: background,
       appBar: _appBar(),
@@ -181,7 +168,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _pickImage() async {
-    // ...(Kode _pickImage Anda tetap sama)...
     final source = await showDialog<ImageSource>(
       context: context,
       builder: (context) => AlertDialog(
@@ -217,7 +203,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<String> _saveImagePermanently(XFile imageFile) async {
-    // ...(Kode _saveImagePermanently Anda tetap sama)...
     final Directory appDir = await getApplicationDocumentsDirectory();
     final String fileName =
         'profile_${DateTime.now().millisecondsSinceEpoch}${p.extension(imageFile.path)}';
@@ -231,22 +216,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return;
     }
 
-    // --- BARU: Cek keunikan email SEBELUM menyimpan ---
-    // (Pengecekan ini opsional namun SANGAT disarankan)
-    // Kita cek apakah email diubah, dan jika iya, apakah email baru sudah ada.
     final newEmail = _emailController.text;
-    if (newEmail != _currentUser!.email) {
-      // Email diubah, cek database
-      // Kita perlu fungsi baru di DatabaseHelper: getUserByEmail
-      // Untuk sekarang, kita skip pengecekan ini agar sederhana
-      // dan asumsikan user memasukkan email unik.
-      
-      // Jika Anda ingin menambahkan pengecekan, Anda perlu:
-      // 1. Buat `getUserByEmail(String email)` di DatabaseHelper.
-      // 2. Panggil: `final existingUser = await dbHelper.getUserByEmail(newEmail);`
-      // 3. Cek: `if (existingUser != null) { ... tampilkan error ... }`
-    }
-    // --------------------------------------------------
+    if (newEmail != _currentUser!.email) {}
 
     setState(() {
       _isLoading = true;
@@ -264,15 +235,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
         imagePathToSave = await _saveImagePermanently(_newImageFile!);
       }
 
-      // --- BARU: Tambahkan 'email' ke copyWith ---
       final updatedUser = _currentUser!.copyWith(
         namaLengkap: _namaController.text,
         nim: _nimController.text,
         kelas: _kelasController.text,
-        email: _emailController.text, // <-- TAMBAHKAN INI
+        email: _emailController.text,
         profileImagePath: imagePathToSave,
       );
-      // ----------------------------------------
 
       await dbHelper.updateUser(updatedUser);
       setState(() {
@@ -292,7 +261,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              // --- BARU: Tampilkan error jika email sudah ada ---
               content: Text(e.toString().contains('UNIQUE constraint failed')
                   ? 'Email tersebut sudah digunakan.'
                   : 'Gagal menyimpan profil: $e'),
@@ -328,7 +296,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: Column(
               children: [
                 GestureDetector(
-                  // ...(GestureDetector Foto tetap sama)...
                   onTap: _isEditing ? _pickImage : null,
                   child: Stack(
                     children: [
@@ -357,7 +324,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(height: 16),
                 _isEditing
                     ? _buildEditableField(
-                        // ...(Field Nama tetap sama)...
                         controller: _namaController,
                         label: 'Nama Lengkap',
                         icon: Icons.person,
@@ -373,7 +339,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(height: 8),
                 _isEditing
                     ? _buildEditableField(
-                        // ...(Field NIM tetap sama)...
                         controller: _nimController,
                         label: 'NIM',
                         icon: Icons.badge,
@@ -393,20 +358,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         'Kelas: ${user.kelas}',
                         style: GoogleFonts.poppins(color: text, fontSize: 14),
                       ),
-
-                // --- BARU: Tambahkan Tampilan/Edit Email ---
                 _isEditing
-                    ? _buildEditableEmailField( // Panggil helper email baru
+                    ? _buildEditableEmailField(
                         controller: _emailController,
                         label: 'Email',
                         icon: Icons.email_outlined,
                       )
                     : Text(
-                        'Email: ${user.email}', // Tampilkan email
+                        'Email: ${user.email}',
                         style: GoogleFonts.poppins(color: text, fontSize: 14),
                       ),
-                // ----------------------------------------
-
                 const SizedBox(height: 16),
                 TextButton(
                   onPressed: () {
@@ -417,9 +378,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         _namaController.text = _currentUser!.namaLengkap;
                         _nimController.text = _currentUser!.nim;
                         _kelasController.text = _currentUser!.kelas;
-                        // --- BARU: Reset controller Email saat batal ---
+
                         _emailController.text = _currentUser!.email;
-                        // ---------------------------------------------
                       }
                     });
                   },
@@ -435,10 +395,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           const SizedBox(height: 32),
-
           if (_isEditing)
             ElevatedButton(
-              // ...(Tombol Simpan tetap sama)...
               onPressed: _saveProfile,
               child: Text("Simpan Perubahan"),
               style: ElevatedButton.styleFrom(
@@ -451,25 +409,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ),
-
           if (!_isEditing) ...[
-            // ...(Saran, Kesan, Notif, Logout tetap sama)...
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Saran',
-                style: GoogleFonts.poppins(
-                    color: primary, fontSize: 16, fontWeight: FontWeight.w600),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Mungkin saran dari saya terkait Mata Kuliah PAM adalah untuk deadline tugas akhir diberitahu sejak awal masuk kuliah supaya mahasiswa bisa lebih bersiap-siap dan mengatur jadwal akademik maupun non akademik dengan lebih efektif dan efisien',
-              textAlign: TextAlign.justify,
-              style: GoogleFonts.poppins(
-                  color: Colors.white.withOpacity(0.8), fontSize: 14),
-            ),
-            const SizedBox(height: 24),
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
@@ -480,7 +420,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Kesan dari saya yaitu Mata Kuliah PAM keren sekali karena saya tidak menyangka saya bisa melangkah sejauh ini. Selain itu, dari dulu saya bertanya-tanya bagaimana cara pengguna berinteraksi dengan aplikasi, dan akhirnya sekarang saya sudah melakukannya',
+              'Menurut saya mata kuliah Pemrograman Aplikasi Mobile sangat keren karena dengan mata kuliah ini saya  belajar terkait pembuatan aplikasi. Akan tetapi tugasnya sangat menantang karena saya tidak terlalu memiliki talenta di bidang coding. Selain itu informasi pemberian deadline sangat mepet yaitu 1 minggu sempat membuat panik.',
+              textAlign: TextAlign.justify,
+              style: GoogleFonts.poppins(
+                  color: Colors.white.withOpacity(0.8), fontSize: 14),
+            ),
+            const SizedBox(height: 24),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Saran',
+                style: GoogleFonts.poppins(
+                    color: primary, fontSize: 16, fontWeight: FontWeight.w600),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Mungkin saran dari saya adalah untuk informasi, semuanya disampaikan sejak awal, tidak hanya informasi ketentuan tugas akhir, tapi juga informasi deadline lebih baik disampaikan sejak awal (tidak mepet) sehingga mempunyai lebih banyak persiapan. Kemudian saya juga berharap materi yang disampaikan di kelas lebih banyak lagi supaya lebih ada gambaran saat mengerjakan UTS/UAS.',
               textAlign: TextAlign.justify,
               style: GoogleFonts.poppins(
                   color: Colors.white.withOpacity(0.8), fontSize: 14),
@@ -532,13 +488,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // Helper untuk field edit (Nama, NIM, Kelas)
   Widget _buildEditableField({
     required TextEditingController controller,
     required String label,
     required IconData icon,
   }) {
-    // ...(Kode _buildEditableField Anda tetap sama)...
     return Padding(
       padding: const EdgeInsets.only(top: 8.0),
       child: TextFormField(
@@ -573,7 +527,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // --- BARU: Widget helper KHUSUS untuk Email (dengan validasi) ---
   Widget _buildEditableEmailField({
     required TextEditingController controller,
     required String label,
@@ -584,7 +537,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: TextFormField(
         controller: controller,
         style: TextStyle(color: Colors.white),
-        keyboardType: TextInputType.emailAddress, // Keyboard email
+        keyboardType: TextInputType.emailAddress,
         decoration: InputDecoration(
           labelText: label,
           labelStyle: TextStyle(color: text),
@@ -604,12 +557,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             borderSide: BorderSide(color: primary),
           ),
         ),
-        validator: (value) { // Validasi email
+        validator: (value) {
           if (value == null || value.isEmpty) {
             return '$label tidak boleh kosong';
           }
-          final emailRegex =
-              RegExp(r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
+          final emailRegex = RegExp(r"^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
           if (!emailRegex.hasMatch(value)) {
             return 'Masukkan format email yang valid';
           }

@@ -2,17 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
-import 'dart:math'; // <-- BARU: Import untuk fungsi acak (Random)
+import 'dart:math';
 
-// --- BARU: Model Sederhana untuk Ayat Pilihan ---
 class AyatPilihan {
   final String surah;
   final int ayatKe;
-  final String teks; // Teks terjemahan
+  final String teks;
 
   AyatPilihan({required this.surah, required this.ayatKe, required this.teks});
 }
-// ---------------------------------------------
 
 class NotificationService {
   static final NotificationService _notificationService =
@@ -23,7 +21,6 @@ class NotificationService {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
-  // Detail channel notifikasi (Tidak berubah)
   static const String _channelId = 'daily_reminder_channel_id';
   static const String _channelName = 'Pengingat Harian Quran';
   static const String _channelDesc =
@@ -38,14 +35,11 @@ class NotificationService {
             importance: Importance.max,
             priority: Priority.high,
             ticker: 'ticker',
-            icon: '@mipmap/ic_launcher', // Pastikan ikon ini ada
-            // --- BARU: Style agar teks notifikasi bisa panjang ---
+            icon: '@mipmap/ic_launcher',
             styleInformation: BigTextStyleInformation(''),
-            // --------------------------------------------------
           ),
           iOS: DarwinNotificationDetails());
 
-  // --- BARU: Daftar Ayat Pilihan (Tidak Diubah) ---
   final List<AyatPilihan> _ayatPilihanList = [
     AyatPilihan(
         surah: "Al-Baqarah",
@@ -99,18 +93,16 @@ class NotificationService {
         teks:
             "Wahai hamba-hamba-Ku yang melampaui batas terhadap diri mereka sendiri! Janganlah kamu berputus asa dari rahmat Allah."),
   ];
-  // ---------------------------------------------------------------------
 
-  // Fungsi initNotification (Tidak berubah)
   Future<void> initNotification() async {
     tz.initializeTimeZones();
-    tz.setLocalLocation(tz.getLocation('Asia/Jakarta')); // Default
+    tz.setLocalLocation(tz.getLocation('Asia/Jakarta'));
 
     const AndroidInitializationSettings initSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
     const DarwinInitializationSettings initSettingsIOS =
         DarwinInitializationSettings(
-      requestAlertPermission: true, /*...*/
+      requestAlertPermission: true,
     );
     const InitializationSettings initializationSettings =
         InitializationSettings(
@@ -129,13 +121,11 @@ class NotificationService {
         onDidReceiveNotificationResponse: onDidReceiveNotificationResponse);
   }
 
-  // Handler onDidReceiveNotificationResponse (Tidak berubah)
   Future<void> onDidReceiveNotificationResponse(
       NotificationResponse notificationResponse) async {
     debugPrint('NOTIFICATION PAYLOAD: ${notificationResponse.payload}');
   }
 
-  // --- FUNGSI 1: Penjadwalan Harian (Tidak Diubah) ---
   Future<void> scheduleDailyReminderNotification() async {
     print("Mencoba menjadwalkan 'Ayat Harian'...");
 
@@ -145,21 +135,17 @@ class NotificationService {
 
     final String notifTitle =
         "📖 Ayat Hari Ini (${ayat.surah} : ${ayat.ayatKe})";
-    final String notifBody = ayat.teks; // Tampilkan terjemahan ayat
+    final String notifBody = ayat.teks;
 
     final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
-    tz.TZDateTime scheduledDate = tz.TZDateTime(
-        tz.local, now.year, now.month, now.day, 8); // Jam 8:00 Pagi
+    tz.TZDateTime scheduledDate =
+        tz.TZDateTime(tz.local, now.year, now.month, now.day, 8);
     if (scheduledDate.isBefore(now)) {
       scheduledDate = scheduledDate.add(const Duration(days: 1));
     }
 
     await flutterLocalNotificationsPlugin.zonedSchedule(
-        0, // ID 0 untuk notifikasi harian
-        notifTitle,
-        notifBody,
-        scheduledDate,
-        _platformChannelSpecifics,
+        0, notifTitle, notifBody, scheduledDate, _platformChannelSpecifics,
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
@@ -168,7 +154,6 @@ class NotificationService {
         "Notifikasi Ayat Harian ($notifTitle) berhasil dijadwalkan untuk $scheduledDate");
   }
 
-  // --- FUNGSI 2: Tombol Demo (Tidak Diubah) ---
   Future<void> showNowReminderNotification() async {
     print("Menampilkan notifikasi demo 'Ayat Harian'...");
 
@@ -181,30 +166,23 @@ class NotificationService {
     final String notifBody = ayat.teks;
 
     await flutterLocalNotificationsPlugin.show(
-        1, // ID 1 untuk notifikasi instan
-        notifTitle,
-        notifBody,
-        _platformChannelSpecifics,
+        1, notifTitle, notifBody, _platformChannelSpecifics,
         payload: 'ayat_harian_demo_payload');
     print("Notifikasi instan '$notifTitle' berhasil ditampilkan.");
   }
 
-  // --- TAMBAHAN BARU: FUNGSI UNTUK BOOKMARK ---
-  /// Menampilkan notifikasi instan sederhana
   Future<void> showSimpleNotification({
     required int id,
     required String title,
     required String body,
     String payload = '',
   }) async {
-    // Menggunakan _platformChannelSpecifics yang sudah Anda definisikan
     await flutterLocalNotificationsPlugin.show(
       id,
       title,
       body,
-      _platformChannelSpecifics, // Menggunakan channel yang sama
+      _platformChannelSpecifics,
       payload: payload,
     );
   }
-  // --- AKHIR TAMBAHAN ---
 }

@@ -3,22 +3,14 @@ import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_pam/globals.dart';
 import 'package:flutter_pam/tabs/surah_tab.dart';
-
-// --- Import Halaman Lain ---
-// (Saya perbaiki import ini agar sesuai dengan apa yang Anda panggil)
-import 'package:flutter_pam/screens/currency_converter_screen.dart'; 
+import 'package:flutter_pam/screens/currency_converter_screen.dart';
 import 'package:flutter_pam/screens/time_converter_screen.dart';
 import 'package:flutter_pam/screens/bookmark_screen.dart';
 import 'package:flutter_pam/screens/profile_screen.dart';
-
-// --- Import Tambahan ---
 import 'package:flutter_pam/delegates/surah_search_delegate.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_pam/helpers/database_helper.dart';
-
-// --- Import untuk Notifikasi ---
 import 'package:permission_handler/permission_handler.dart';
-// import 'package:flutter_pam/services/notification_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -30,17 +22,11 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
-  // final NotificationService _notificationService = NotificationService();
-
   List<Widget> _pages = [
-    HomeTabContent(userId: null), // Mulai dengan userId null
+    HomeTabContent(userId: null),
     const KalkulatorZakatPage(),
-    
-    // --- PERBAIKAN 1: Menyamakan urutan _pages dengan items ---
-    const TimeConverterScreen(), // Indeks 2 (Sholat)
-    const BookmarkScreen(),      // Indeks 3 (Bookmark)
-    // --- AKHIR PERBAIKAN 1 ---
-
+    const TimeConverterScreen(),
+    const BookmarkScreen(),
     const ProfileScreen(),
   ];
 
@@ -54,24 +40,18 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _loadUserAndSetupPages();
-    // Panggil fungsi izin (nama fungsinya tetap, tapi isinya kita ubah)
     _requestPermissionAndSchedule();
   }
 
-  // --- PERBAIKAN 2: Hapus penjadwalan, sisakan permintaan izin ---
   Future<void> _requestPermissionAndSchedule() async {
-    // 1. Minta izin (Ini akan memunculkan pop-up)
     PermissionStatus status = await Permission.notification.request();
 
-    // 2. Cek statusnya (untuk debug)
     if (status.isGranted) {
       print("Izin notifikasi DIBERIKAN.");
-      // KITA TIDAK MEMANGGIL scheduleDailyReminderNotification() LAGI
     } else {
       print("Izin notifikasi DITOLAK.");
     }
   }
-  // --- AKHIR PERBAIKAN 2 ---
 
   Future<void> _loadUserAndSetupPages() async {
     final prefs = await SharedPreferences.getInstance();
@@ -80,19 +60,15 @@ class _HomeScreenState extends State<HomeScreen> {
     if (mounted) {
       setState(() {
         _pages = [
-          HomeTabContent(userId: userId), // Kirim userId ke HomeTabContent
-          const KalkulatorZakatPage(), // Indeks 1
-          
-          // (Ubah urutan di sini juga agar konsisten)
-          const TimeConverterScreen(), // Indeks 2
-          const BookmarkScreen(),      // Indeks 3
-
-          const ProfileScreen(), // Indeks 4
+          HomeTabContent(userId: userId),
+          const KalkulatorZakatPage(),
+          const TimeConverterScreen(),
+          const BookmarkScreen(),
+          const ProfileScreen(),
         ];
       });
     }
   }
-  // --- AKHIR MODIFIKASI ---
 
   @override
   Widget build(BuildContext context) {
@@ -107,12 +83,13 @@ class _HomeScreenState extends State<HomeScreen> {
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         items: [
-          // Urutan ini sudah benar (sesuai UI)
-          _bottomBarItem(icon: "assets/svgs/quran-icon.svg", label: "Quran"),   // 0
-          _bottomBarItem(icon: "assets/svgs/money-icon.svg", label: "Zakat"),   // 1
-          _bottomBarItem(icon: "assets/svgs/time-icon.svg", label: "Sholat"),  // 2
-          _bottomBarItem(icon: "assets/svgs/bookmark-icon.svg", label: "Bookmark"), // 3
-          _bottomBarItem(icon: "assets/svgs/profile-icon.svg", label: "Profile"),  // 4
+          _bottomBarItem(icon: "assets/svgs/quran-icon.svg", label: "Quran"),
+          _bottomBarItem(icon: "assets/svgs/money-icon.svg", label: "Zakat"),
+          _bottomBarItem(icon: "assets/svgs/time-icon.svg", label: "Sholat"),
+          _bottomBarItem(
+              icon: "assets/svgs/bookmark-icon.svg", label: "Bookmark"),
+          _bottomBarItem(
+              icon: "assets/svgs/profile-icon.svg", label: "Profile"),
         ],
       ),
     );
@@ -132,7 +109,6 @@ class _HomeScreenState extends State<HomeScreen> {
           label: label);
 }
 
-// ... (Class HomeTabContent dan _HomeTabContentState Anda TIDAK BERUBAH) ...
 class HomeTabContent extends StatefulWidget {
   final int? userId;
   HomeTabContent({super.key, required this.userId});
@@ -145,7 +121,7 @@ class _HomeTabContentState extends State<HomeTabContent> {
   String _userName = "Pengguna";
   bool _isLoadingName = true;
   final dbHelper = DatabaseHelper();
- 
+
   @override
   void initState() {
     super.initState();
@@ -224,9 +200,7 @@ class _HomeTabContentState extends State<HomeTabContent> {
                 ),
               )
             ],
-            body: TabBarView(children: [
-              SurahTab(userId: widget.userId) // Kirim userId ke tab
-            ]),
+            body: TabBarView(children: [SurahTab(userId: widget.userId)]),
           ),
         ),
       ),
