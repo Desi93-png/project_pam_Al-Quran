@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_pam/globals.dart'; // Warna
+import 'package:flutter_pam/globals.dart'; 
 import 'package:google_fonts/google_fonts.dart';
-import 'package:shared_preferences/shared_preferences.dart'; // Untuk session
-import 'package:flutter_pam/screens/login_screen.dart'; // Untuk navigasi
-import 'package:flutter_pam/helpers/database_helper.dart'; // Import DatabaseHelper
-import 'package:flutter_pam/models/user_model.dart'; // Import UserModel
-import 'package:flutter_pam/services/notification_service.dart'; // Sesuaikan path
+import 'package:shared_preferences/shared_preferences.dart'; 
+import 'package:flutter_pam/screens/login_screen.dart'; 
+import 'package:flutter_pam/helpers/database_helper.dart'; 
+import 'package:flutter_pam/models/user_model.dart'; 
+import 'package:flutter_pam/services/notification_service.dart'; 
 
-// --- Import untuk Image Picker ---
-import 'dart:io'; // Untuk File
+
+import 'dart:io'; 
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
-// --------------------------------------
+
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -22,24 +22,24 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  // State untuk data
+  
   User? _currentUser;
   bool _isLoading = true;
   String _errorMessage = '';
   final dbHelper = DatabaseHelper();
   final NotificationService _notificationService = NotificationService();
 
-  // State untuk Mode Edit
+  
   bool _isEditing = false;
   final _formKey = GlobalKey<FormState>();
 
-  // Controller
+  
   late TextEditingController _namaController;
   late TextEditingController _nimController;
   late TextEditingController _kelasController;
   late TextEditingController _emailController;
 
-  // State untuk gambar baru
+  
   XFile? _newImageFile;
 
   @override
@@ -218,10 +218,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return;
     }
 
-    // Cek keunikan email (Opsional, logika dasar)
+    
     final newEmail = _emailController.text;
     if (newEmail != _currentUser!.email) {
-      // Di sini bisa ditambahkan pengecekan ke DB jika diperlukan
+      
     }
 
     setState(() {
@@ -289,7 +289,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         user.profileImagePath!.isNotEmpty) {
       profileImage = FileImage(File(user.profileImagePath!));
     } else {
-      // --- PERUBAHAN: Ganti default image ---
+      
       profileImage = const AssetImage('assets/images/profil.png');
     }
 
@@ -415,11 +415,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
 
-          // --- PERUBAHAN: Kesan dan Saran DIHAPUS dari sini ---
-          // Hanya tampilkan tombol-tombol fungsional jika TIDAK sedang edit
+          
+          
 
           if (!_isEditing) ...[
-            // Tombol Notifikasi (Fitur Fungsional)
+            
             ElevatedButton(
               onPressed: () async {
                 print("Tombol Notifikasi Demo Ditekan");
@@ -446,7 +446,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            // Tombol Logout
+            
             ElevatedButton(
               onPressed: _logout,
               child: Text("Logout"),
