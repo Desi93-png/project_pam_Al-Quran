@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_pam/globals.dart';
+import 'package:flutter_pam/globals.dart'; // Warna
 import 'package:google_fonts/google_fonts.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_pam/screens/login_screen.dart';
-import 'package:flutter_pam/helpers/database_helper.dart';
-import 'package:flutter_pam/models/user_model.dart';
-import 'package:flutter_pam/services/notification_service.dart';
-import 'dart:io';
+import 'package:shared_preferences/shared_preferences.dart'; // Untuk session
+import 'package:flutter_pam/screens/login_screen.dart'; // Untuk navigasi
+import 'package:flutter_pam/helpers/database_helper.dart'; // Import DatabaseHelper
+import 'package:flutter_pam/models/user_model.dart'; // Import UserModel
+import 'package:flutter_pam/services/notification_service.dart'; // Sesuaikan path
+
+// --- Import untuk Image Picker ---
+import 'dart:io'; // Untuk File
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
+// --------------------------------------
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -19,21 +22,24 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  // State untuk data
   User? _currentUser;
   bool _isLoading = true;
   String _errorMessage = '';
   final dbHelper = DatabaseHelper();
   final NotificationService _notificationService = NotificationService();
 
+  // State untuk Mode Edit
   bool _isEditing = false;
   final _formKey = GlobalKey<FormState>();
 
+  // Controller
   late TextEditingController _namaController;
   late TextEditingController _nimController;
   late TextEditingController _kelasController;
-
   late TextEditingController _emailController;
 
+  // State untuk gambar baru
   XFile? _newImageFile;
 
   @override
@@ -59,9 +65,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             _namaController = TextEditingController(text: user.namaLengkap);
             _nimController = TextEditingController(text: user.nim);
             _kelasController = TextEditingController(text: user.kelas);
-
             _emailController = TextEditingController(text: user.email);
-
             _isLoading = false;
           });
         } else {
@@ -88,9 +92,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _namaController.dispose();
     _nimController.dispose();
     _kelasController.dispose();
-
     _emailController.dispose();
-
     super.dispose();
   }
 
@@ -216,8 +218,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return;
     }
 
+    // Cek keunikan email (Opsional, logika dasar)
     final newEmail = _emailController.text;
-    if (newEmail != _currentUser!.email) {}
+    if (newEmail != _currentUser!.email) {
+      // Di sini bisa ditambahkan pengecekan ke DB jika diperlukan
+    }
 
     setState(() {
       _isLoading = true;
@@ -284,7 +289,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         user.profileImagePath!.isNotEmpty) {
       profileImage = FileImage(File(user.profileImagePath!));
     } else {
-      profileImage = const AssetImage('assets/images/desi.jpg');
+      // --- PERUBAHAN: Ganti default image ---
+      profileImage = const AssetImage('assets/images/profil.png');
     }
 
     return Form(
@@ -349,7 +355,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                 _isEditing
                     ? _buildEditableField(
-                        // ...(Field Kelas tetap sama)...
                         controller: _kelasController,
                         label: 'Kelas',
                         icon: Icons.school,
@@ -378,7 +383,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         _namaController.text = _currentUser!.namaLengkap;
                         _nimController.text = _currentUser!.nim;
                         _kelasController.text = _currentUser!.kelas;
-
                         _emailController.text = _currentUser!.email;
                       }
                     });
@@ -395,6 +399,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           const SizedBox(height: 32),
+
           if (_isEditing)
             ElevatedButton(
               onPressed: _saveProfile,
@@ -409,39 +414,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ),
+
+          // --- PERUBAHAN: Kesan dan Saran DIHAPUS dari sini ---
+          // Hanya tampilkan tombol-tombol fungsional jika TIDAK sedang edit
+
           if (!_isEditing) ...[
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Kesan',
-                style: GoogleFonts.poppins(
-                    color: primary, fontSize: 16, fontWeight: FontWeight.w600),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Menurut saya mata kuliah Pemrograman Aplikasi Mobile sangat keren karena dengan mata kuliah ini saya  belajar terkait pembuatan aplikasi. Akan tetapi tugasnya sangat menantang karena saya tidak terlalu memiliki talenta di bidang coding. Selain itu informasi pemberian deadline sangat mepet yaitu 1 minggu sempat membuat panik.',
-              textAlign: TextAlign.justify,
-              style: GoogleFonts.poppins(
-                  color: Colors.white.withOpacity(0.8), fontSize: 14),
-            ),
-            const SizedBox(height: 24),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Saran',
-                style: GoogleFonts.poppins(
-                    color: primary, fontSize: 16, fontWeight: FontWeight.w600),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Mungkin saran dari saya adalah untuk informasi, semuanya disampaikan sejak awal, tidak hanya informasi ketentuan tugas akhir, tapi juga informasi deadline lebih baik disampaikan sejak awal (tidak mepet) sehingga mempunyai lebih banyak persiapan. Kemudian saya juga berharap materi yang disampaikan di kelas lebih banyak lagi supaya lebih ada gambaran saat mengerjakan UTS/UAS.',
-              textAlign: TextAlign.justify,
-              style: GoogleFonts.poppins(
-                  color: Colors.white.withOpacity(0.8), fontSize: 14),
-            ),
-            const SizedBox(height: 40),
+            // Tombol Notifikasi (Fitur Fungsional)
             ElevatedButton(
               onPressed: () async {
                 print("Tombol Notifikasi Demo Ditekan");
@@ -468,6 +446,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
             const SizedBox(height: 16),
+            // Tombol Logout
             ElevatedButton(
               onPressed: _logout,
               child: Text("Logout"),

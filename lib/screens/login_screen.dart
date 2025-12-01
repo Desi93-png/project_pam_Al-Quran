@@ -133,7 +133,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: TextStyle(color: Colors.white),
                   keyboardType: TextInputType.emailAddress,
                   decoration: _inputDecoration("Email").copyWith(
-                    fillColor: Color(0xFF121931),
+                    fillColor: gray,
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -153,7 +153,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   obscureText: !_isPasswordVisible,
                   style: TextStyle(color: Colors.white),
                   decoration: _inputDecoration("Password").copyWith(
-                    fillColor: Color(0xFF121931),
+                    fillColor: gray,
                     suffixIcon: IconButton(
                       icon: Icon(
                         _isPasswordVisible
@@ -182,7 +182,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ? CircularProgressIndicator(color: Colors.white)
                       : Text("Login"),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFFA44AFF),
+                    backgroundColor: primary,
                     foregroundColor: Colors.white,
                     padding: EdgeInsets.symmetric(vertical: 16),
                     textStyle: GoogleFonts.poppins(
